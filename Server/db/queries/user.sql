@@ -25,3 +25,21 @@ WHERE email = $1;
 
 -- name: User_Exists_By_Email :one
 SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);
+
+
+-- name: CreateSession :one
+INSERT INTO sessions (
+  id,
+  email,
+  refresh_token,
+  user_agent,
+  client_ip,
+  is_blocked,
+  expires_at
+) VALUES (
+  $1, $2 , $3 , $4 , $5, $6 , $7
+) RETURNING *;
+
+-- name: GetSession :one
+SELECT * FROM sessions
+WHERE id = $1 LIMIT 1;

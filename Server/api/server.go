@@ -9,14 +9,19 @@ import (
 )
 
 type Server struct {
-	router *gin.Engine
-	store  *sqlc.Store
-	config util.Config
+	router     *gin.Engine
+	store      *sqlc.Store
+	config     util.Config
+	tokenMaker util.Maker
 }
 
 func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 
-	server := &Server{store: store, config: config}
+	tokenMaker, err := util.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, err
+	}
+	server := &Server{store: store, config: config, tokenMaker: tokenMaker}
 
 	router := gin.Default()
 
@@ -30,6 +35,8 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	//User
 	router.POST("/api/user/affiliate", server.create_user_affiliate)
 	router.POST("/api/user/brand", server.create_user_brand)
+	router.POST("/api/user/affiliate/login", server.login_user_affiliate)
+	router.POST("/api/user/brand/login", server.login_user_brand)
 
 	server.router = router
 

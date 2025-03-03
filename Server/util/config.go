@@ -1,33 +1,35 @@
 package util
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 )
 
-
-
 type Config struct {
-	Driver string `mapstructure:"DRIVER"`
-	DbUrl string   `mapstructure:"DB_URL"`
-	Port string     `mapstructure:"PORT"`
-	Api_Url string    `mapstructure:"API_URL"`
+	Driver               string        `mapstructure:"DRIVER"`
+	DbUrl                string        `mapstructure:"DB_URL"`
+	Port                 string        `mapstructure:"PORT"`
+	Api_Url              string        `mapstructure:"API_URL"`
+	TokenSymmetricKey    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 
-
-func LoadConfig(path string) (config Config , err error) {
+func LoadConfig(path string) (config Config, err error) {
 
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
 
-	 viper.AutomaticEnv()
+	viper.AutomaticEnv()
 
-	 err = viper.ReadInConfig()
-	 if err != nil {
+	err = viper.ReadInConfig()
+	if err != nil {
 		return
-	 }
+	}
 
-  err = viper.Unmarshal(&config)
-  return
+	err = viper.Unmarshal(&config)
+	return
 
 }
