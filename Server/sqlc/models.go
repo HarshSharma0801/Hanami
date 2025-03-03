@@ -6,6 +6,7 @@ package sqlc
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -56,6 +57,17 @@ type Conversion struct {
 	ClickID   sql.NullInt64
 	Amount    string
 	Timestamp sql.NullTime
+}
+
+type Session struct {
+	ID           uuid.UUID
+	Email        string
+	RefreshToken string
+	UserAgent    string
+	ClientIp     string
+	IsBlocked    bool
+	ExpiresAt    time.Time
+	CreatedAt    time.Time
 }
 
 type TrackingLink struct {
