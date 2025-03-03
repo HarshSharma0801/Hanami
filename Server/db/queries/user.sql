@@ -14,8 +14,8 @@ VALUES ($1, $2, $3, 'affiliate', CURRENT_TIMESTAMP)
 RETURNING id;
 
 -- name: Create_Affiliate :one
-INSERT INTO affiliates (user_id, created_at)
-VALUES ($1, CURRENT_TIMESTAMP)
+INSERT INTO affiliates (user_id, campaign_id ,created_at)
+VALUES ($1,$2 ,CURRENT_TIMESTAMP)
 RETURNING id;
 
 -- name: Get_User_By_Email :one
@@ -26,6 +26,21 @@ WHERE email = $1;
 -- name: User_Exists_By_Email :one
 SELECT EXISTS(SELECT 1 FROM users WHERE email = $1);
 
+-- name: User_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM users WHERE id = $1);
+
+
+-- name: User_Affiliate_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND role = 'affiliate');
+
+-- name: User_Brand_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND role = 'brand');
+
+-- name: Brand_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM brands WHERE id = $1);
+
+-- name: Affiliate_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM affiliates WHERE id = $1);
 
 -- name: CreateSession :one
 INSERT INTO sessions (
