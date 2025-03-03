@@ -12,10 +12,10 @@ import (
 )
 
 type Affiliate struct {
-	ID        int64
-	UserID    sql.NullInt64
-	BrandID   sql.NullInt64
-	CreatedAt sql.NullTime
+	ID         int64
+	UserID     sql.NullInt64
+	CampaignID int64
+	CreatedAt  sql.NullTime
 }
 
 type AffiliateCampaign struct {

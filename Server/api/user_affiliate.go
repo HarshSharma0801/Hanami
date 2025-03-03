@@ -23,13 +23,21 @@ type login_user_affiliate_params struct {
 	Email    string `json:"email,omitempty" binding:"required"`
 }
 
+type login_user_res struct {
+	ID        int64        `json:"id,omitempty"`
+	Username  string       `json:"username,omitempty"`
+	Email     string       `json:"email,omitempty"`
+	Role      string       `json:"role,omitempty"`
+	CreatedAt sql.NullTime `json:"created_at,omitempty"`
+}
+
 type login_user_affiliate_res struct {
-	SessionID             uuid.UUID `json:"session_id,omitempty"`
-	AccessToken           string    `json:"access_token,omitempty"`
-	AccessTokenExpiresAt  time.Time `json:"access_token_expires_at,omitempty"`
-	RefreshToken          string    `json:"refresh_token,omitempty"`
-	RefreshTokenExpiresAt time.Time `json:"refresh_token_expires_at,omitempty"`
-	User                  sqlc.User `json:"user,omitempty"`
+	SessionID             uuid.UUID      `json:"session_id,omitempty"`
+	AccessToken           string         `json:"access_token,omitempty"`
+	AccessTokenExpiresAt  time.Time      `json:"access_token_expires_at,omitempty"`
+	RefreshToken          string         `json:"refresh_token,omitempty"`
+	RefreshTokenExpiresAt time.Time      `json:"refresh_token_expires_at,omitempty"`
+	User                  login_user_res `json:"user,omitempty"`
 }
 
 func (server *Server) create_user_affiliate(ctx *gin.Context) {
@@ -70,20 +78,9 @@ func (server *Server) create_user_affiliate(ctx *gin.Context) {
 		return
 	}
 
-	convertedID := sql.NullInt64{
-		Int64: id,
-		Valid: true,
-	}
+	log.Printf("New User Affiliate Created : %v", id)
 
-	user_id, err := server.store.Create_Affiliate(ctx, convertedID)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	log.Printf("New User Affiliate Created : %v", user_id)
-
-	ctx.JSON(http.StatusOK, user_id)
+	ctx.JSON(http.StatusOK, id)
 }
 
 func (server *Server) login_user_affiliate(ctx *gin.Context) {
@@ -139,7 +136,13 @@ func (server *Server) login_user_affiliate(ctx *gin.Context) {
 		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
 		RefreshToken:          refreshToken,
 		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
-		User:                  user,
+		User: login_user_res{
+			Email:     user.Email,
+			Username:  user.Username,
+			Role:      user.Role,
+			ID:        user.ID,
+			CreatedAt: user.CreatedAt,
+		},
 	}
 
 	ctx.JSON(http.StatusOK, response)

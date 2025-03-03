@@ -26,12 +26,12 @@ type login_user_brand_params struct {
 }
 
 type login_user_brand_res struct {
-	SessionID             uuid.UUID `json:"session_id,omitempty"`
-	AccessToken           string    `json:"access_token,omitempty"`
-	AccessTokenExpiresAt  time.Time `json:"access_token_expires_at,omitempty"`
-	RefreshToken          string    `json:"refresh_token,omitempty"`
-	RefreshTokenExpiresAt time.Time `json:"refresh_token_expires_at,omitempty"`
-	User                  sqlc.User `json:"user,omitempty"`
+	SessionID             uuid.UUID      `json:"session_id,omitempty"`
+	AccessToken           string         `json:"access_token,omitempty"`
+	AccessTokenExpiresAt  time.Time      `json:"access_token_expires_at,omitempty"`
+	RefreshToken          string         `json:"refresh_token,omitempty"`
+	RefreshTokenExpiresAt time.Time      `json:"refresh_token_expires_at,omitempty"`
+	User                  login_user_res `json:"user,omitempty"`
 }
 
 func (server *Server) create_user_brand(ctx *gin.Context) {
@@ -152,7 +152,13 @@ func (server *Server) login_user_brand(ctx *gin.Context) {
 		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
 		RefreshToken:          refreshToken,
 		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
-		User:                  user,
+		User: login_user_res{
+			Email:     user.Email,
+			Username:  user.Username,
+			Role:      user.Role,
+			ID:        user.ID,
+			CreatedAt: user.CreatedAt,
+		},
 	}
 
 	ctx.JSON(http.StatusOK, response)

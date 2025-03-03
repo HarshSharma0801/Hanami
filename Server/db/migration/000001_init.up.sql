@@ -18,7 +18,7 @@ CREATE TABLE "brands" (
 CREATE TABLE "affiliates" (
   "id" bigserial PRIMARY KEY,
   "user_id" bigint UNIQUE,
-  "brand_id" bigint,
+  "campaign_id" bigint NOT NULL,
   "created_at" timestamp DEFAULT (CURRENT_TIMESTAMP)
 );
 
@@ -64,13 +64,27 @@ CREATE TABLE "conversions" (
   "timestamp" timestamp DEFAULT (CURRENT_TIMESTAMP)
 );
 
+
+
+CREATE TABLE "sessions" (
+  "id" uuid PRIMARY KEY,
+  "email" varchar NOT NULL,
+  "refresh_token" varchar NOT NULL,
+  "user_agent" varchar NOT NULL,
+  "client_ip" varchar NOT NULL,
+  "is_blocked" boolean NOT NULL DEFAULT false,
+  "expires_at" timestamptz NOT NULL DEFAULT now(),
+  "created_at" timestamptz NOT NULL DEFAULT now()
+);
+
+
 COMMENT ON COLUMN "users"."role" IS 'enum: brand, affiliate';
 
 ALTER TABLE "brands" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "affiliates" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
-ALTER TABLE "affiliates" ADD FOREIGN KEY ("brand_id") REFERENCES "brands" ("id");
+ALTER TABLE "affiliates" ADD FOREIGN KEY ("campaign_id") REFERENCES "campaigns" ("id");
 
 ALTER TABLE "campaigns" ADD FOREIGN KEY ("brand_id") REFERENCES "brands" ("id");
 
@@ -85,3 +99,5 @@ ALTER TABLE "tracking_links" ADD FOREIGN KEY ("campaign_id") REFERENCES "campaig
 ALTER TABLE "clicks" ADD FOREIGN KEY ("tracking_link_id") REFERENCES "tracking_links" ("id");
 
 ALTER TABLE "conversions" ADD FOREIGN KEY ("click_id") REFERENCES "clicks" ("id");
+
+ALTER TABLE "sessions" ADD FOREIGN KEY ("email") REFERENCES "users" ("email");

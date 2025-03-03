@@ -13,6 +13,28 @@ import (
 	"github.com/google/uuid"
 )
 
+const affiliate_Exists_By_Id = `-- name: Affiliate_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM affiliates WHERE id = $1)
+`
+
+func (q *Queries) Affiliate_Exists_By_Id(ctx context.Context, id int64) (bool, error) {
+	row := q.db.QueryRowContext(ctx, affiliate_Exists_By_Id, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const brand_Exists_By_Id = `-- name: Brand_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM brands WHERE id = $1)
+`
+
+func (q *Queries) Brand_Exists_By_Id(ctx context.Context, id int64) (bool, error) {
+	row := q.db.QueryRowContext(ctx, brand_Exists_By_Id, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createSession = `-- name: CreateSession :one
 INSERT INTO sessions (
   id,
@@ -62,13 +84,18 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 }
 
 const create_Affiliate = `-- name: Create_Affiliate :one
-INSERT INTO affiliates (user_id, created_at)
-VALUES ($1, CURRENT_TIMESTAMP)
+INSERT INTO affiliates (user_id, campaign_id ,created_at)
+VALUES ($1,$2 ,CURRENT_TIMESTAMP)
 RETURNING id
 `
 
-func (q *Queries) Create_Affiliate(ctx context.Context, userID sql.NullInt64) (int64, error) {
-	row := q.db.QueryRowContext(ctx, create_Affiliate, userID)
+type Create_AffiliateParams struct {
+	UserID     sql.NullInt64
+	CampaignID int64
+}
+
+func (q *Queries) Create_Affiliate(ctx context.Context, arg Create_AffiliateParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, create_Affiliate, arg.UserID, arg.CampaignID)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -172,12 +199,45 @@ func (q *Queries) Get_User_By_Email(ctx context.Context, email string) (User, er
 	return i, err
 }
 
+const user_Affiliate_Exists_By_Id = `-- name: User_Affiliate_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND role = 'affiliate')
+`
+
+func (q *Queries) User_Affiliate_Exists_By_Id(ctx context.Context, id int64) (bool, error) {
+	row := q.db.QueryRowContext(ctx, user_Affiliate_Exists_By_Id, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const user_Brand_Exists_By_Id = `-- name: User_Brand_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND role = 'brand')
+`
+
+func (q *Queries) User_Brand_Exists_By_Id(ctx context.Context, id int64) (bool, error) {
+	row := q.db.QueryRowContext(ctx, user_Brand_Exists_By_Id, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const user_Exists_By_Email = `-- name: User_Exists_By_Email :one
 SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)
 `
 
 func (q *Queries) User_Exists_By_Email(ctx context.Context, email string) (bool, error) {
 	row := q.db.QueryRowContext(ctx, user_Exists_By_Email, email)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const user_Exists_By_Id = `-- name: User_Exists_By_Id :one
+SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)
+`
+
+func (q *Queries) User_Exists_By_Id(ctx context.Context, id int64) (bool, error) {
+	row := q.db.QueryRowContext(ctx, user_Exists_By_Id, id)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
