@@ -50,14 +50,14 @@ func (q *Queries) Delete_TrackingLink(ctx context.Context, id int64) error {
 	return err
 }
 
-const get_TrackingLink = `-- name: Get_TrackingLink :one
+const get_TrackingLink_By_Link_Code = `-- name: Get_TrackingLink_By_Link_Code :one
 SELECT id, affiliate_id, campaign_id, link_code, created_at
 FROM tracking_links
-WHERE id = $1
+WHERE link_code = $1
 `
 
-func (q *Queries) Get_TrackingLink(ctx context.Context, id int64) (TrackingLink, error) {
-	row := q.db.QueryRowContext(ctx, get_TrackingLink, id)
+func (q *Queries) Get_TrackingLink_By_Link_Code(ctx context.Context, linkCode string) (TrackingLink, error) {
+	row := q.db.QueryRowContext(ctx, get_TrackingLink_By_Link_Code, linkCode)
 	var i TrackingLink
 	err := row.Scan(
 		&i.ID,
@@ -139,4 +139,23 @@ func (q *Queries) Get_TrackingLinks_By_Campaign(ctx context.Context, campaignID 
 		return nil, err
 	}
 	return items, nil
+}
+
+const get_Tracking_By_Link = `-- name: Get_Tracking_By_Link :one
+SELECT id, affiliate_id, campaign_id, link_code, created_at
+FROM tracking_links
+WHERE id = $1
+`
+
+func (q *Queries) Get_Tracking_By_Link(ctx context.Context, id int64) (TrackingLink, error) {
+	row := q.db.QueryRowContext(ctx, get_Tracking_By_Link, id)
+	var i TrackingLink
+	err := row.Scan(
+		&i.ID,
+		&i.AffiliateID,
+		&i.CampaignID,
+		&i.LinkCode,
+		&i.CreatedAt,
+	)
+	return i, err
 }
