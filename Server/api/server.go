@@ -47,6 +47,17 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	//Campaign-Affiliate
 	router.POST("/api/brand/campaign/affiliate", server.create_campaign_affiliate)
 
+	//Tracking-Link
+	router.POST("/api/brand/campaign/tracking/new", server.create_tracking_link)
+	router.GET("/api/brand/campaign/tracking/:id", server.get_tracking_link_by_id)
+	router.GET("/api/campaign/tracking/:id", server.get_tracking_links_by_campaign_id)
+	router.GET("/api/affiliate/tracking/:id", server.get_tracking_links_by_affiliate_id)
+	router.POST("/api/brand/campaign/tracking/:id", server.delete_tracking_link_by_id)
+
+
+	//Redirect-URL-MAIN
+	router.GET("/", server.redirect_user)
+
 	server.router = router
 
 	return server, nil

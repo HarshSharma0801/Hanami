@@ -9,10 +9,15 @@ INSERT INTO tracking_links (
 ) RETURNING *;
 
 
--- name: Get_TrackingLink :one
+-- name: Get_Tracking_By_Link :one
 SELECT *
 FROM tracking_links
 WHERE id = $1;
+
+-- name: Get_TrackingLink_By_Link_Code :one
+SELECT *
+FROM tracking_links
+WHERE link_code = $1;
 
 -- name: Get_TrackingLinks_By_Affiliate :many
 SELECT *
