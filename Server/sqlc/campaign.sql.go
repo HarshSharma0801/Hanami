@@ -143,6 +143,80 @@ func (q *Queries) Get_Campaigns_By_Brand(ctx context.Context, brandID sql.NullIn
 	return items, nil
 }
 
+const get_Campaigns_By_UserID_As_Affiliate = `-- name: Get_Campaigns_By_UserID_As_Affiliate :many
+SELECT 
+    c.id AS campaign_id,
+    c.brand_id,
+    c.name AS campaign_name,
+    c.description AS campaign_description,
+    c.commission_rate,
+    c.landing_url,
+    c.created_at AS campaign_created_at,
+    ac.created_at AS affiliate_campaign_created_at,
+    b.id AS brand_id,
+    b.company_name,
+    b.website,
+    b.created_at AS brand_created_at
+FROM users u
+JOIN affiliates a ON u.id = a.user_id
+JOIN affiliate_campaigns ac ON a.id = ac.affiliate_id
+JOIN campaigns c ON ac.campaign_id = c.id
+JOIN brands b ON c.brand_id = b.id
+WHERE u.id = $1
+ORDER BY c.created_at DESC
+`
+
+type Get_Campaigns_By_UserID_As_AffiliateRow struct {
+	CampaignID                 int64
+	BrandID                    sql.NullInt64
+	CampaignName               string
+	CampaignDescription        sql.NullString
+	CommissionRate             string
+	LandingUrl                 string
+	CampaignCreatedAt          sql.NullTime
+	AffiliateCampaignCreatedAt sql.NullTime
+	BrandID_2                  int64
+	CompanyName                string
+	Website                    sql.NullString
+	BrandCreatedAt             sql.NullTime
+}
+
+func (q *Queries) Get_Campaigns_By_UserID_As_Affiliate(ctx context.Context, id int64) ([]Get_Campaigns_By_UserID_As_AffiliateRow, error) {
+	rows, err := q.db.QueryContext(ctx, get_Campaigns_By_UserID_As_Affiliate, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Get_Campaigns_By_UserID_As_AffiliateRow
+	for rows.Next() {
+		var i Get_Campaigns_By_UserID_As_AffiliateRow
+		if err := rows.Scan(
+			&i.CampaignID,
+			&i.BrandID,
+			&i.CampaignName,
+			&i.CampaignDescription,
+			&i.CommissionRate,
+			&i.LandingUrl,
+			&i.CampaignCreatedAt,
+			&i.AffiliateCampaignCreatedAt,
+			&i.BrandID_2,
+			&i.CompanyName,
+			&i.Website,
+			&i.BrandCreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const update_Campaign = `-- name: Update_Campaign :one
 UPDATE campaigns
 SET 

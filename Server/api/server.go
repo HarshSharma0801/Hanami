@@ -38,10 +38,16 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	router.POST("/api/user/affiliate/login", server.login_user_affiliate)
 	router.POST("/api/user/brand/login", server.login_user_brand)
 
+	//Brand
+	router.GET("/api/user/brand/:id", server.get_brand_by_user_id)
+
+
+
 	//Campaign
 	router.POST("/api/brand/campaign/new", server.create_campaign)
 	router.GET("/api/campaign/:id", server.get_campaign_by_id)
 	router.GET("/api/brand/campaign/:id", server.get_campaign_by_brandId)
+	router.GET("/api/affiliate/campaign/:id", server.get_campaign_for_affiliate)
 	router.DELETE("/api/campaign/:id", server.delete_campaign_by_id)
 
 	//Campaign-Affiliate

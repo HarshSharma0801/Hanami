@@ -73,7 +73,7 @@ func (server *Server) get_tracking_link_by_id(ctx *gin.Context) {
 }
 
 func (server *Server) get_tracking_links_by_affiliate_id(ctx *gin.Context) {
-	affiliateIDParam := ctx.Param("affiliate_id")
+	affiliateIDParam := ctx.Param("id")
 	affiliateID, err := strconv.ParseInt(affiliateIDParam, 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
