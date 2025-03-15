@@ -4,9 +4,14 @@ import { Boxes } from "../ui/background-boxes";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export function Landing() {
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  const user = session?.user;
+
   return (
     <div className="h-screen relative w-full overflow-hidden bg-slate-900 flex flex-col items-center justify-center">
       <div className="absolute inset-0 w-full h-full bg-slate-900 z-20 [mask-image:radial-gradient(transparent,white)] pointer-events-none" />
@@ -21,7 +26,11 @@ export function Landing() {
         </p>
         <Button
           onClick={() => {
-            router.push("/register");
+            if (user) {
+              router.push("/main");
+            } else {
+              router.push("/register");
+            }
           }}
           className="bg-black hover:bg-black mt-5 px-10 z-10"
         >

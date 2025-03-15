@@ -26,17 +26,6 @@ func (server *Server) create_campaign(ctx *gin.Context) {
 		return
 	}
 
-	exists, err := server.store.Campaign_Exists_By_Name(ctx, req.Name)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	if exists {
-		ctx.JSON(http.StatusConflict, gin.H{"error": "campaign with this name already exists"})
-		return
-	}
-
 	covertedDescription := sql.NullString{
 		String: req.Description,
 		Valid:  true,
@@ -52,7 +41,6 @@ func (server *Server) create_campaign(ctx *gin.Context) {
 		Int64: covertedBrandId,
 		Valid: true,
 	}
-
 
 	brand_exists, err := server.store.Brand_Exists_By_Id(ctx, covertedBrandId)
 	if err != nil {
@@ -134,7 +122,7 @@ func (server *Server) get_campaign_by_brandId(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, campaigns)
+	ctx.JSON(http.StatusOK, gin.H{"campaigns": campaigns})
 
 }
 
@@ -159,5 +147,29 @@ func (server *Server) delete_campaign_by_id(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"valid": true})
+
+}
+
+func (server *Server) get_campaign_for_affiliate(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	convertedID, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	campaigns, err := server.store.Get_Campaigns_By_UserID_As_Affiliate(ctx, convertedID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"campaigns": campaigns})
 
 }
