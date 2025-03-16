@@ -31,6 +31,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.51.3",
     "react-icons": "^5.0.1",
+    "react-toastify": "^11.0.5",
     "resend": "^3.4.0",
     "sonner": "^2.0.1",
     "tailwind-merge": "^2.6.0",

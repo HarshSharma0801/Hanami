@@ -36,3 +36,15 @@ ORDER BY created_at DESC;
 -- name: Delete_TrackingLink :exec
 DELETE FROM tracking_links
 WHERE id = $1;
+
+
+-- name: Get_TrackingLink_For_Affiliate :one
+SELECT 
+    tl.link_code,
+    tl.campaign_id,
+    a.id AS affiliate_id,
+    u.username
+FROM users u
+JOIN affiliates a ON u.id = a.user_id
+JOIN tracking_links tl ON a.id = tl.affiliate_id
+WHERE tl.campaign_id = $1 AND u.id = $2;

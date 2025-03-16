@@ -16,10 +16,13 @@ import {
   TableRow,
 } from "../ui/table";
 import { useBrand } from "@/providers/BrandProvider";
+import { useRouter } from "next/navigation";
+import { Spinner } from "../ui/spinner";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
   const { brand } = useBrand();
+  const router = useRouter();
 
   const { data: campaignsData } = useQuery<CampaignsResponse>({
     queryKey: ["campaigns", session?.user.id],
@@ -50,7 +53,13 @@ export default function DashboardPage() {
             <TableBody>
               {campaignsData?.campaigns.length ? (
                 campaignsData.campaigns.map((campaign, index) => (
-                  <TableRow className="cursor-pointer" key={index}>
+                  <TableRow
+                    onClick={() => {
+                      router.push(`/campaigns/${campaign.ID}`);
+                    }}
+                    className="cursor-pointer"
+                    key={index}
+                  >
                     <TableCell>{campaign.Name}</TableCell>
                     <TableCell>{campaign.LandingUrl}</TableCell>
                     <TableCell>
@@ -72,19 +81,26 @@ export default function DashboardPage() {
 
       {session?.user.role !== "brand" && (
         <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Brand</TableHead>
-                <TableHead>Campaign</TableHead>
-                <TableHead>Landing URL</TableHead>
-                <TableHead>Created Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {campaignsAffiliateData?.campaigns.length ? (
-                campaignsAffiliateData.campaigns.map((campaign, index) => (
-                  <TableRow className="cursor-pointer" key={index}>
+          {campaignsAffiliateData?.campaigns.length &&
+          campaignsAffiliateData?.campaigns.length > 0 ? (
+            campaignsAffiliateData.campaigns.map((campaign, index) => (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Brand</TableHead>
+                    <TableHead>Campaign</TableHead>
+                    <TableHead>Landing URL</TableHead>
+                    <TableHead>Created Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow
+                    onClick={() => {
+                      router.push(`/campaigns/${campaign.CampaignID}`);
+                    }}
+                    className="cursor-pointer"
+                    key={index}
+                  >
                     <TableCell>{campaign.CompanyName}</TableCell>
                     <TableCell>{campaign.CampaignName}</TableCell>
                     <TableCell>{campaign.LandingUrl}</TableCell>
@@ -94,16 +110,14 @@ export default function DashboardPage() {
                       ).toLocaleDateString()}
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center">
-                    No campaigns found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                </TableBody>
+              </Table>
+            ))
+          ) : (
+            <div className="flex justify-center items-center">
+              <Spinner size="medium" />
+            </div>
+          )}
         </div>
       )}
     </div>

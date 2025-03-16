@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
 const sidebarItems = [
-  { name: "Dashboard", href: "/main/dashboard" },
-  { name: "Profile", href: "/main/profile" },
-  { name: "Settings", href: "/main/settings" },
+  { name: "Campaigns", href: "/campaigns" },
+  { name: "Profile", href: "/campaigns/profile" },
+  { name: "Settings", href: "/campaigns/settings" },
 ];
 
 export default function Sidebar({
