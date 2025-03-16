@@ -132,3 +132,41 @@ func (server *Server) delete_tracking_link_by_id(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Tracking link deleted successfully"})
 }
+
+func (server *Server) get_tracking_link_for_affiliate(ctx *gin.Context) {
+	campaignIDParam := ctx.Query("campaign_id")
+	campaignID, err := strconv.ParseInt(campaignIDParam, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid campaign_id"})
+		return
+	}
+
+	convertedCampaignID := sql.NullInt64{
+		Valid: true,
+		Int64: campaignID,
+	}
+
+	userIDParam := ctx.Query("user_id")
+	userID, err := strconv.ParseInt(userIDParam, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
+		return
+	}
+
+	args := sqlc.Get_TrackingLink_For_AffiliateParams{
+		CampaignID: convertedCampaignID,
+		ID:         userID,
+	}
+
+	trackingCode, err := server.store.Get_TrackingLink_For_Affiliate(ctx, args)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "Tracking code not found"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"tracking_code": trackingCode})
+}

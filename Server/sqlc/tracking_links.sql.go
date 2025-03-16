@@ -69,6 +69,42 @@ func (q *Queries) Get_TrackingLink_By_Link_Code(ctx context.Context, linkCode st
 	return i, err
 }
 
+const get_TrackingLink_For_Affiliate = `-- name: Get_TrackingLink_For_Affiliate :one
+SELECT 
+    tl.link_code,
+    tl.campaign_id,
+    a.id AS affiliate_id,
+    u.username
+FROM users u
+JOIN affiliates a ON u.id = a.user_id
+JOIN tracking_links tl ON a.id = tl.affiliate_id
+WHERE tl.campaign_id = $1 AND u.id = $2
+`
+
+type Get_TrackingLink_For_AffiliateParams struct {
+	CampaignID sql.NullInt64
+	ID         int64
+}
+
+type Get_TrackingLink_For_AffiliateRow struct {
+	LinkCode    string
+	CampaignID  sql.NullInt64
+	AffiliateID int64
+	Username    string
+}
+
+func (q *Queries) Get_TrackingLink_For_Affiliate(ctx context.Context, arg Get_TrackingLink_For_AffiliateParams) (Get_TrackingLink_For_AffiliateRow, error) {
+	row := q.db.QueryRowContext(ctx, get_TrackingLink_For_Affiliate, arg.CampaignID, arg.ID)
+	var i Get_TrackingLink_For_AffiliateRow
+	err := row.Scan(
+		&i.LinkCode,
+		&i.CampaignID,
+		&i.AffiliateID,
+		&i.Username,
+	)
+	return i, err
+}
+
 const get_TrackingLinks_By_Affiliate = `-- name: Get_TrackingLinks_By_Affiliate :many
 SELECT id, affiliate_id, campaign_id, link_code, created_at
 FROM tracking_links

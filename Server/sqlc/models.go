@@ -59,6 +59,15 @@ type Conversion struct {
 	Timestamp sql.NullTime
 }
 
+type Invite struct {
+	ID          int64
+	CampaignID  int64
+	AffiliateID int64
+	Status      string
+	InvitedAt   sql.NullTime
+	RespondedAt sql.NullTime
+}
+
 type Session struct {
 	ID           uuid.UUID
 	Email        string

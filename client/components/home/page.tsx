@@ -27,7 +27,7 @@ export function Landing() {
         <Button
           onClick={() => {
             if (user) {
-              router.push("/main");
+              router.push("/campaigns");
             } else {
               router.push("/register");
             }

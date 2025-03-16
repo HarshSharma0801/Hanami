@@ -28,3 +28,17 @@ export const getCampaignsByUserId = async (userId: string) => {
     console.log(error);
   }
 };
+
+
+export const getCampaignsById = async (id: string) => {
+  try {
+    const response = await axios.get(`/api/campaign/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -41,7 +41,8 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	//Brand
 	router.GET("/api/user/brand/:id", server.get_brand_by_user_id)
 
-
+	//Affiliates
+	router.GET("/api/affiliates/campaign/:id", server.get_affiliates_by_campaign_id)
 
 	//Campaign
 	router.POST("/api/brand/campaign/new", server.create_campaign)
@@ -59,7 +60,7 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	router.GET("/api/campaign/tracking/:id", server.get_tracking_links_by_campaign_id)
 	router.GET("/api/affiliate/tracking/:id", server.get_tracking_links_by_affiliate_id)
 	router.POST("/api/brand/campaign/tracking/:id", server.delete_tracking_link_by_id)
-
+	router.GET("/api/campaign/affiliate/tracking", server.get_tracking_link_for_affiliate)
 
 	//Redirect-URL-MAIN
 	router.GET("/", server.redirect_user)
