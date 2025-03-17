@@ -121,3 +121,48 @@ export interface TrackingLink {
 export interface TrackingResponse {
   tracking_code: TrackingLink;
 }
+
+export interface ICreateCampaign {
+  name: string;
+  description: string;
+  commission_rate: string;
+  landing_url: string;
+  brand_id: string;
+}
+
+export interface Invite {
+  ID: number;
+  CampaignID: number;
+  UserID: number;
+  Status: string;
+  InvitedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  RespondedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  CampaignName: string;
+  CampaignDescription: {
+    String: string;
+    Valid: true;
+  };
+  CommissionRate: string;
+  LandingUrl: string;
+  CampaignCreatedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  BrandID: number;
+  CompanyName: string;
+  Website: {
+    String: string;
+    Valid: boolean;
+  };
+  BrandCreatedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+}
+

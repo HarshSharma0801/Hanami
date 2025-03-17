@@ -148,3 +148,21 @@ func (server *Server) login_user_affiliate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 
 }
+
+func (server *Server) check_affiliate_by_email(ctx *gin.Context) {
+	email := ctx.Query("email")
+	if email == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Email is required"})
+		return
+	}
+
+	exists, err := server.store.Check_Email_Availability(ctx, email)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"available": exists,
+	})
+}

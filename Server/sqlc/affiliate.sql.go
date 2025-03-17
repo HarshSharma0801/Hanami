@@ -10,6 +10,27 @@ import (
 	"database/sql"
 )
 
+const check_Affiliate_By_UserID_CampaignID = `-- name: Check_Affiliate_By_UserID_CampaignID :one
+SELECT EXISTS (
+    SELECT 1
+    FROM affiliates a
+    JOIN affiliate_campaigns ac ON a.id = ac.affiliate_id
+    WHERE a.user_id = $1 AND ac.campaign_id = $2
+) AS exists
+`
+
+type Check_Affiliate_By_UserID_CampaignIDParams struct {
+	UserID     sql.NullInt64
+	CampaignID int64
+}
+
+func (q *Queries) Check_Affiliate_By_UserID_CampaignID(ctx context.Context, arg Check_Affiliate_By_UserID_CampaignIDParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, check_Affiliate_By_UserID_CampaignID, arg.UserID, arg.CampaignID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const get_Affiliate_By_UserID = `-- name: Get_Affiliate_By_UserID :one
 SELECT 
     id AS affiliate_id,

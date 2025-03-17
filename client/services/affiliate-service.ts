@@ -14,3 +14,19 @@ export const getAffiliatesByCampaignId = async (campaignId: string) => {
     console.log(error);
   }
 };
+
+export const checkAffiliatesByEmail = async (email: string) => {
+  try {
+    const response = await axios.get(`/api/affiliates/check`, {
+      params: {
+        email: email,
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
