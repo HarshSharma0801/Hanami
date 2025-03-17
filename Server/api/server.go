@@ -43,6 +43,7 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 
 	//Affiliates
 	router.GET("/api/affiliates/campaign/:id", server.get_affiliates_by_campaign_id)
+	router.GET("/api/affiliates/check", server.check_affiliate_by_email)
 
 	//Campaign
 	router.POST("/api/brand/campaign/new", server.create_campaign)
@@ -50,6 +51,10 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	router.GET("/api/brand/campaign/:id", server.get_campaign_by_brandId)
 	router.GET("/api/affiliate/campaign/:id", server.get_campaign_for_affiliate)
 	router.DELETE("/api/campaign/:id", server.delete_campaign_by_id)
+
+	//Invite
+	router.POST("/api/brand/campaign/invite", server.send_invite)
+	router.GET("/api/brand/campaign/invite/:id", server.get_invites_by_user_id)
 
 	//Campaign-Affiliate
 	router.POST("/api/brand/campaign/affiliate", server.create_campaign_affiliate)

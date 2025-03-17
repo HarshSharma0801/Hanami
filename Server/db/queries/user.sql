@@ -58,3 +58,9 @@ INSERT INTO sessions (
 -- name: GetSession :one
 SELECT * FROM sessions
 WHERE id = $1 LIMIT 1;
+
+
+-- name: Check_Email_Availability :one
+SELECT COUNT(*) > 0 AS exists
+FROM users
+WHERE email = $1 AND role = 'affiliate';

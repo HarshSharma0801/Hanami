@@ -35,6 +35,19 @@ func (q *Queries) Brand_Exists_By_Id(ctx context.Context, id int64) (bool, error
 	return exists, err
 }
 
+const check_Email_Availability = `-- name: Check_Email_Availability :one
+SELECT COUNT(*) > 0 AS exists
+FROM users
+WHERE email = $1 AND role = 'affiliate'
+`
+
+func (q *Queries) Check_Email_Availability(ctx context.Context, email string) (bool, error) {
+	row := q.db.QueryRowContext(ctx, check_Email_Availability, email)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createSession = `-- name: CreateSession :one
 INSERT INTO sessions (
   id,

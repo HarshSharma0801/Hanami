@@ -8,6 +8,8 @@ import { getBrandByUserId } from "@/services/brand-service";
 import { Brand } from "@/sdk/types";
 import { useBrand } from "@/providers/BrandProvider";
 import { useEffect } from "react";
+import { Bell } from "lucide-react";
+import RespondDialog from "./respond-dialog";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -42,7 +44,8 @@ export default function Navbar() {
           {isLoading ? "..." : brandData?.brand.CompanyName}
         </Button>
       )}
-      <div className="space-x-4">
+      <div className="space-x-4 flex justify-center items-center">
+        {session?.user.role !== "brand" && <RespondDialog />}
         {session?.user.role !== "brand" && (
           <Button variant="outline">Hi, {session?.user.name}</Button>
         )}

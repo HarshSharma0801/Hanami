@@ -62,7 +62,7 @@ type Conversion struct {
 type Invite struct {
 	ID          int64
 	CampaignID  int64
-	AffiliateID int64
+	UserID      int64
 	Status      string
 	InvitedAt   sql.NullTime
 	RespondedAt sql.NullTime

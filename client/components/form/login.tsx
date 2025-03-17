@@ -63,7 +63,7 @@ export function Login() {
         return;
       }
 
-      const redirectPath = "/main";
+      const redirectPath = "/campaigns";
       router.push(redirectPath);
       router.refresh();
     } catch (error: any) {

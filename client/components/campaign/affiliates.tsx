@@ -11,6 +11,7 @@ import {
 } from "../ui/table";
 import { getAffiliatesByCampaignId } from "@/services/affiliate-service";
 import { motion } from "framer-motion";
+import InviteDialog from "./invite-dialog";
 
 export default function Affiliates({ campaignId }: { campaignId: string }) {
   const {
@@ -45,7 +46,17 @@ export default function Affiliates({ campaignId }: { campaignId: string }) {
   return (
     <div className="p-6 py-10  h-full">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl text-left font-bold text-gray-800 mb-6">Affiliates</h2>
+        <div className="flex justify-between">
+          <div>
+            <h2 className="text-3xl text-left font-bold text-gray-800 mb-6">
+              Affiliates
+            </h2>
+          </div>
+
+          <div>
+            <InviteDialog campaignId={campaignId} />
+          </div>
+        </div>
         <div className="border rounded-lg shadow-lg bg-white overflow-hidden">
           {affiliateData?.affiliates && affiliateData.affiliates.length > 0 ? (
             <Table>
