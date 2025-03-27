@@ -19,10 +19,11 @@ INSERT INTO clicks (
     user_ip,
     user_agent,
     referrer,
-    timestamp
+    utm_source,
+    utm_medium
 ) VALUES (
-    $1, $2, $3, $4, $5, CURRENT_TIMESTAMP
-) RETURNING id, tracking_link_id, click_id, user_ip, user_agent, referrer, timestamp
+    $1, $2, $3, $4, $5, $6, $7
+) RETURNING id, tracking_link_id, click_id, user_ip, user_agent, referrer, timestamp, utm_source, utm_medium
 `
 
 type Create_ClickParams struct {
@@ -31,6 +32,8 @@ type Create_ClickParams struct {
 	UserIp         string
 	UserAgent      sql.NullString
 	Referrer       sql.NullString
+	UtmSource      sql.NullString
+	UtmMedium      sql.NullString
 }
 
 func (q *Queries) Create_Click(ctx context.Context, arg Create_ClickParams) (Click, error) {
@@ -40,6 +43,8 @@ func (q *Queries) Create_Click(ctx context.Context, arg Create_ClickParams) (Cli
 		arg.UserIp,
 		arg.UserAgent,
 		arg.Referrer,
+		arg.UtmSource,
+		arg.UtmMedium,
 	)
 	var i Click
 	err := row.Scan(
@@ -50,12 +55,14 @@ func (q *Queries) Create_Click(ctx context.Context, arg Create_ClickParams) (Cli
 		&i.UserAgent,
 		&i.Referrer,
 		&i.Timestamp,
+		&i.UtmSource,
+		&i.UtmMedium,
 	)
 	return i, err
 }
 
 const get_Click_By_ClickID = `-- name: Get_Click_By_ClickID :one
-SELECT id, tracking_link_id, click_id, user_ip, user_agent, referrer, timestamp
+SELECT id, tracking_link_id, click_id, user_ip, user_agent, referrer, timestamp, utm_source, utm_medium
 FROM clicks
 WHERE click_id = $1
 `
@@ -71,12 +78,14 @@ func (q *Queries) Get_Click_By_ClickID(ctx context.Context, clickID uuid.UUID) (
 		&i.UserAgent,
 		&i.Referrer,
 		&i.Timestamp,
+		&i.UtmSource,
+		&i.UtmMedium,
 	)
 	return i, err
 }
 
 const get_Click_By_ID = `-- name: Get_Click_By_ID :one
-SELECT id, tracking_link_id, click_id, user_ip, user_agent, referrer, timestamp
+SELECT id, tracking_link_id, click_id, user_ip, user_agent, referrer, timestamp, utm_source, utm_medium
 FROM clicks
 WHERE id = $1
 `
@@ -92,6 +101,8 @@ func (q *Queries) Get_Click_By_ID(ctx context.Context, id int64) (Click, error) 
 		&i.UserAgent,
 		&i.Referrer,
 		&i.Timestamp,
+		&i.UtmSource,
+		&i.UtmMedium,
 	)
 	return i, err
 }

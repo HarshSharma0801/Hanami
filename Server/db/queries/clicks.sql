@@ -5,9 +5,10 @@ INSERT INTO clicks (
     user_ip,
     user_agent,
     referrer,
-    timestamp
+    utm_source,
+    utm_medium
 ) VALUES (
-    $1, $2, $3, $4, $5, CURRENT_TIMESTAMP
+    $1, $2, $3, $4, $5, $6, $7
 ) RETURNING *;
 
 -- name: Get_Click_By_ID :one
