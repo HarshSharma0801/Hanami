@@ -17,7 +17,6 @@ import {
 } from "../ui/table";
 import { useBrand } from "@/providers/BrandProvider";
 import { useRouter } from "next/navigation";
-import { Spinner } from "../ui/spinner";
 import CreateCampaignDialog from "./campaign-dialog";
 
 export default function DashboardPage() {
@@ -59,7 +58,8 @@ export default function DashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {campaignsData?.campaigns && campaignsData?.campaigns.length>0 ? (
+                {campaignsData?.campaigns &&
+                campaignsData?.campaigns.length > 0 ? (
                   campaignsData.campaigns.map((campaign, index) => (
                     <TableRow
                       onClick={() => {
@@ -92,20 +92,20 @@ export default function DashboardPage() {
         <>
           <div className="flex  py-6 text-center text-2xl">Campaigns</div>
           <div className="border rounded-md">
-            {campaignsAffiliateData?.campaigns &&
-            campaignsAffiliateData?.campaigns.length > 0 ? (
-              campaignsAffiliateData.campaigns.map((campaign, index) => (
-                <>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Brand</TableHead>
-                        <TableHead>Campaign</TableHead>
-                        <TableHead>Landing URL</TableHead>
-                        <TableHead>Created Date</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Brand</TableHead>
+                  <TableHead>Campaign</TableHead>
+                  <TableHead>Landing URL</TableHead>
+                  <TableHead>Created Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {campaignsAffiliateData?.campaigns &&
+                  campaignsAffiliateData?.campaigns.length > 0 &&
+                  campaignsAffiliateData.campaigns.map((campaign, index) => (
+                    <>
                       <TableRow
                         onClick={() => {
                           router.push(`/campaigns/${campaign.CampaignID}`);
@@ -122,15 +122,10 @@ export default function DashboardPage() {
                           ).toLocaleDateString()}
                         </TableCell>
                       </TableRow>
-                    </TableBody>
-                  </Table>
-                </>
-              ))
-            ) : (
-              <div className="flex justify-center items-center">
-                No Campaigns yet
-              </div>
-            )}
+                    </>
+                  ))}
+              </TableBody>
+            </Table>
           </div>
         </>
       )}

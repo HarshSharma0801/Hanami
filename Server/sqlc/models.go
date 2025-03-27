@@ -50,6 +50,8 @@ type Click struct {
 	UserAgent      sql.NullString
 	Referrer       sql.NullString
 	Timestamp      sql.NullTime
+	UtmSource      sql.NullString
+	UtmMedium      sql.NullString
 }
 
 type Conversion struct {

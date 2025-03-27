@@ -17,7 +17,7 @@ CREATE TABLE "brands" (
 
 CREATE TABLE "affiliates" (
   "id" bigserial PRIMARY KEY,
-  "user_id" bigint UNIQUE,
+  "user_id" bigint ,
   "campaign_id" bigint NOT NULL,
   "created_at" timestamp DEFAULT (CURRENT_TIMESTAMP)
 );
