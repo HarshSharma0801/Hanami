@@ -56,9 +56,11 @@ type Click struct {
 
 type Conversion struct {
 	ID        int64
-	ClickID   sql.NullInt64
-	Amount    string
+	Amount    float64
 	Timestamp sql.NullTime
+	Currency  sql.NullString
+	ClickID   uuid.NullUUID
+	Weight    sql.NullFloat64
 }
 
 type Invite struct {
