@@ -70,6 +70,11 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	//Redirect-URL-MAIN
 	router.GET("/", server.redirect_user)
 
+
+	//Conversions
+	router.POST("/api/conversion", server.create_conversion)
+
+
 	server.router = router
 
 	return server, nil
