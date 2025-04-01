@@ -8,11 +8,13 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 const sidebarItems = [
   { name: "Campaigns", href: "/campaigns" },
   { name: "Profile", href: "/campaigns/profile" },
   { name: "Settings", href: "/campaigns/settings" },
+  { name: "Developer Doc", href: "/brand/docs" },
 ];
 
 export default function Sidebar({
@@ -20,6 +22,7 @@ export default function Sidebar({
 }: {
   onCollapseChange: (isCollapsed: boolean) => void;
 }) {
+  const { data: session } = useSession();
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -45,22 +48,43 @@ export default function Sidebar({
         {isCollapsed ? <Menu /> : <X />}
       </Button>
       <nav className="space-y-2">
-        {sidebarItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center p-3 rounded-md transition-colors whitespace-nowrap",
-              pathname === item.href
-                ? "bg-gray-800 text-white"
-                : "text-gray-300 hover:bg-gray-800 hover:text-white",
-              isCollapsed && "justify-center"
-            )}
-          >
-            {!isCollapsed && item.name}
-            {isCollapsed && item.name[0]}
-          </Link>
-        ))}
+        {session?.user.role !== "brand" &&
+          sidebarItems
+            .filter((data) => data.name !== "Developer Doc")
+            .map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center p-3 rounded-md transition-colors whitespace-nowrap",
+                  pathname === item.href
+                    ? "bg-gray-800 text-white"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white",
+                  isCollapsed && "justify-center"
+                )}
+              >
+                {!isCollapsed && item.name}
+                {isCollapsed && item.name[0]}
+              </Link>
+            ))}
+
+        {session?.user.role === "brand" &&
+          sidebarItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center p-3 rounded-md transition-colors whitespace-nowrap",
+                pathname === item.href
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-white",
+                isCollapsed && "justify-center"
+              )}
+            >
+              {!isCollapsed && item.name}
+              {isCollapsed && item.name[0]}
+            </Link>
+          ))}
       </nav>
     </motion.div>
   );
