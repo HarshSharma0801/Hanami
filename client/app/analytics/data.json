@@ -1,0 +1,85 @@
+{
+  "campaignPerformance": [
+    { "month": "Jan", "impressions": 4000, "clicks": 2400, "conversions": 500 },
+    { "month": "Feb", "impressions": 3000, "clicks": 1398, "conversions": 350 },
+    { "month": "Mar", "impressions": 2000, "clicks": 9800, "conversions": 720 },
+    { "month": "Apr", "impressions": 2780, "clicks": 3908, "conversions": 560 },
+    { "month": "May", "impressions": 1890, "clicks": 4800, "conversions": 610 },
+    { "month": "Jun", "impressions": 2390, "clicks": 3800, "conversions": 420 },
+    { "month": "Jul", "impressions": 3490, "clicks": 4300, "conversions": 590 }
+  ],
+  "audienceBreakdown": [
+    { "name": "18-24", "value": 20 },
+    { "name": "25-34", "value": 35 },
+    { "name": "35-44", "value": 25 },
+    { "name": "45-54", "value": 12 },
+    { "name": "55+", "value": 8 }
+  ],
+  "geographicDistribution": [
+    { "country": "USA", "value": 45 },
+    { "country": "UK", "value": 15 },
+    { "country": "Canada", "value": 12 },
+    { "country": "Australia", "value": 8 },
+    { "country": "Germany", "value": 7 },
+    { "country": "France", "value": 6 },
+    { "country": "Others", "value": 7 }
+  ],
+  "deviceStats": [
+    { "name": "Mobile", "value": 55 },
+    { "name": "Desktop", "value": 35 },
+    { "name": "Tablet", "value": 10 }
+  ],
+  "revenueData": [
+    { "month": "Jan", "revenue": 10500 },
+    { "month": "Feb", "revenue": 12000 },
+    { "month": "Mar", "revenue": 18000 },
+    { "month": "Apr", "revenue": 15500 },
+    { "month": "May", "revenue": 17800 },
+    { "month": "Jun", "revenue": 22000 },
+    { "month": "Jul", "revenue": 24500 }
+  ],
+  "campaignEffectiveness": [
+    { "campaign": "Summer Sale", "roi": 3.2, "conversionRate": 4.8, "engagement": 7.5 },
+    { "campaign": "Holiday Special", "roi": 4.5, "conversionRate": 6.2, "engagement": 8.3 },
+    { "campaign": "Product Launch", "roi": 2.8, "conversionRate": 3.9, "engagement": 9.1 },
+    { "campaign": "Brand Awareness", "roi": 1.9, "conversionRate": 2.7, "engagement": 8.7 },
+    { "campaign": "Seasonal Promo", "roi": 3.7, "conversionRate": 5.3, "engagement": 7.8 }
+  ],
+  "metricsOverTime": {
+    "ctr": [
+      { "date": "2023-01", "value": 2.4 },
+      { "date": "2023-02", "value": 2.7 },
+      { "date": "2023-03", "value": 3.1 },
+      { "date": "2023-04", "value": 2.9 },
+      { "date": "2023-05", "value": 3.3 },
+      { "date": "2023-06", "value": 3.5 },
+      { "date": "2023-07", "value": 3.8 }
+    ],
+    "cpc": [
+      { "date": "2023-01", "value": 1.2 },
+      { "date": "2023-02", "value": 1.15 },
+      { "date": "2023-03", "value": 1.08 },
+      { "date": "2023-04", "value": 1.12 },
+      { "date": "2023-05", "value": 1.05 },
+      { "date": "2023-06", "value": 0.98 },
+      { "date": "2023-07", "value": 0.95 }
+    ],
+    "conversionRate": [
+      { "date": "2023-01", "value": 4.2 },
+      { "date": "2023-02", "value": 4.5 },
+      { "date": "2023-03", "value": 5.1 },
+      { "date": "2023-04", "value": 4.8 },
+      { "date": "2023-05", "value": 5.3 },
+      { "date": "2023-06", "value": 5.7 },
+      { "date": "2023-07", "value": 6.1 }
+    ]
+  },
+  "keyMetrics": {
+    "totalCampaigns": 42,
+    "activeInfluencers": 156,
+    "totalReach": "2.4M",
+    "averageEngagement": "8.7%",
+    "totalRevenue": "$125,450",
+    "roi": "3.8x"
+  }
+} 
