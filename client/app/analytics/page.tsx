@@ -3,16 +3,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-// Import tab components
 import {
   OverviewTab,
   CampaignAnalysisTab,
   AudienceInsightsTab,
   RevenueStatsTab,
 } from "./components/tabs";
-
-// Import types and data
 import { AnalyticsData, ContainerAnimation } from "./types";
 import data from "./data.json";
 
@@ -25,7 +21,6 @@ export default function AnalyticsPage() {
 
   if (!mounted) return null;
 
-  // Animation variants
   const container: ContainerAnimation = {
     hidden: { opacity: 0 },
     show: {

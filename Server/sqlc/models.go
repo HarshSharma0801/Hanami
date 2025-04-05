@@ -72,6 +72,15 @@ type Invite struct {
 	RespondedAt sql.NullTime
 }
 
+type Sale struct {
+	ID        int64
+	BrandID   int64
+	Amount    string
+	Currency  string
+	Timestamp sql.NullTime
+	CreatedAt sql.NullTime
+}
+
 type Session struct {
 	ID           uuid.UUID
 	Email        string
