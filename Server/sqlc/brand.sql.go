@@ -10,6 +10,21 @@ import (
 	"database/sql"
 )
 
+const get_BrandID_By_TrackingCode = `-- name: Get_BrandID_By_TrackingCode :one
+SELECT c.brand_id
+FROM tracking_links tl
+JOIN campaigns c ON tl.campaign_id = c.id
+WHERE tl.link_code = $1
+LIMIT 1
+`
+
+func (q *Queries) Get_BrandID_By_TrackingCode(ctx context.Context, linkCode string) (sql.NullInt64, error) {
+	row := q.db.QueryRowContext(ctx, get_BrandID_By_TrackingCode, linkCode)
+	var brand_id sql.NullInt64
+	err := row.Scan(&brand_id)
+	return brand_id, err
+}
+
 const get_Brand_By_UserID = `-- name: Get_Brand_By_UserID :one
 SELECT 
     b.id, b.user_id, b.company_name, b.website, b.created_at,

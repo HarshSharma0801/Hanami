@@ -4,8 +4,10 @@ import (
 	"Promotopia/sqlc"
 	"Promotopia/util"
 	"database/sql"
+	"log"
 	"net/http"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 
@@ -39,6 +41,26 @@ func (server *Server) create_conversion(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "At least one tracker is required"})
 		return
 	}
+
+	brandId, err := server.store.Get_BrandID_By_TrackingCode(ctx, req.Trackers[0].TrackingCode)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no brandId found"})
+		return
+	}
+
+	sale_args := sqlc.Create_SaleParams{
+		BrandID:  brandId.Int64,
+		Amount:   strconv.FormatFloat(req.Amount, 'f', -1, 64),
+		Currency: req.Currency,
+	}
+
+	sale, err := server.store.Create_Sale(ctx, sale_args)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no sale creation"})
+		return
+	}
+
+	log.Printf("created new new sale : %v", sale.ID)
 
 	trackers := req.Trackers
 	sort.Slice(trackers, func(i, j int) bool {
