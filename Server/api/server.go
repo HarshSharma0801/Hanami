@@ -77,6 +77,7 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	router.GET("/api/keymetrics", server.get_Brand_Key_Metrics)
 	router.GET("/api/campaignPerformance", server.get_Brand_Campaign_Performance)
 	router.GET("/api/revenue", server.get_Brand_Revenue)
+	router.GET("/api/utm", server.get_Brand_UTM_Performance)
 
 
 	server.router = router

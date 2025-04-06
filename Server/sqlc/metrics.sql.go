@@ -168,3 +168,83 @@ func (q *Queries) Get_Revenue_Data(ctx context.Context, brandID int64) ([]Get_Re
 	}
 	return items, nil
 }
+
+const get_UTMMedium_Counts = `-- name: Get_UTMMedium_Counts :many
+SELECT 
+    COALESCE(utm_medium, 'Unknown') AS name,
+    COUNT(*) AS value
+FROM clicks cl
+JOIN tracking_links tl ON cl.tracking_link_id = tl.id
+JOIN campaigns c ON tl.campaign_id = c.id
+WHERE c.brand_id = $1
+GROUP BY utm_medium
+ORDER BY value DESC
+`
+
+type Get_UTMMedium_CountsRow struct {
+	Name  string
+	Value int64
+}
+
+func (q *Queries) Get_UTMMedium_Counts(ctx context.Context, brandID sql.NullInt64) ([]Get_UTMMedium_CountsRow, error) {
+	rows, err := q.db.QueryContext(ctx, get_UTMMedium_Counts, brandID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Get_UTMMedium_CountsRow
+	for rows.Next() {
+		var i Get_UTMMedium_CountsRow
+		if err := rows.Scan(&i.Name, &i.Value); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const get_UTMSource_Counts = `-- name: Get_UTMSource_Counts :many
+SELECT 
+    COALESCE(utm_source, 'Unknown') AS name,
+    COUNT(*) AS value
+FROM clicks cl
+JOIN tracking_links tl ON cl.tracking_link_id = tl.id
+JOIN campaigns c ON tl.campaign_id = c.id
+WHERE c.brand_id = $1
+GROUP BY utm_source
+ORDER BY value DESC
+`
+
+type Get_UTMSource_CountsRow struct {
+	Name  string
+	Value int64
+}
+
+func (q *Queries) Get_UTMSource_Counts(ctx context.Context, brandID sql.NullInt64) ([]Get_UTMSource_CountsRow, error) {
+	rows, err := q.db.QueryContext(ctx, get_UTMSource_Counts, brandID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Get_UTMSource_CountsRow
+	for rows.Next() {
+		var i Get_UTMSource_CountsRow
+		if err := rows.Scan(&i.Name, &i.Value); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

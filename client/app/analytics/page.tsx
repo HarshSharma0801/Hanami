@@ -64,7 +64,7 @@ export default function AnalyticsPage() {
 
         {/* Tab contents */}
         <TabsContent value="overview">
-          <OverviewTab data={data as AnalyticsData} container={container} />
+          <OverviewTab  container={container} />
         </TabsContent>
 
         <TabsContent value="campaigns">

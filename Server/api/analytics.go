@@ -121,3 +121,32 @@ func (server *Server) get_Brand_Revenue(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"revenueData": revenueData})
 }
+
+func (server *Server) get_Brand_UTM_Performance(ctx *gin.Context) {
+	id := ctx.Query("brandId")
+
+	brandId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
+	}
+
+	convertedId := sql.NullInt64{
+		Int64: brandId,
+		Valid: true,
+	}
+
+	utmSource, err := server.store.Get_UTMSource_Counts(ctx, convertedId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	utmMedium, err := server.store.Get_UTMMedium_Counts(ctx, convertedId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"utmSource": utmSource, "utmMedium": utmMedium})
+}

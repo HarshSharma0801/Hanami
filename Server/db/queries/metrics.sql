@@ -70,3 +70,27 @@ FROM sales s
 WHERE s.brand_id = $1
 GROUP BY TO_CHAR(s.timestamp, 'Mon')
 ORDER BY MIN(s.timestamp);
+
+
+
+-- name: Get_UTMSource_Counts :many
+SELECT 
+    COALESCE(utm_source, 'Unknown') AS name,
+    COUNT(*) AS value
+FROM clicks cl
+JOIN tracking_links tl ON cl.tracking_link_id = tl.id
+JOIN campaigns c ON tl.campaign_id = c.id
+WHERE c.brand_id = $1
+GROUP BY utm_source
+ORDER BY value DESC;
+
+-- name: Get_UTMMedium_Counts :many
+SELECT 
+    COALESCE(utm_medium, 'Unknown') AS name,
+    COUNT(*) AS value
+FROM clicks cl
+JOIN tracking_links tl ON cl.tracking_link_id = tl.id
+JOIN campaigns c ON tl.campaign_id = c.id
+WHERE c.brand_id = $1
+GROUP BY utm_medium
+ORDER BY value DESC;
