@@ -18,19 +18,22 @@ type Config struct {
 }
 
 func LoadConfig(path string) (config Config, err error) {
-
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
 
+	// Enable environment variable overrides
 	viper.AutomaticEnv()
 
+	// Read config file, but don't fail if it's missing
 	err = viper.ReadInConfig()
 	if err != nil {
-		return
+		// Ignore file not found errors; rely on env vars
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return config, err
+		}
 	}
 
 	err = viper.Unmarshal(&config)
-	return
-
+	return config, err
 }
