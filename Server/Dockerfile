@@ -13,11 +13,11 @@ RUN go mod download
 # Copy the source code
 COPY . .
 
-# Verify the main package exists
-RUN if [ ! -f cmd/server/main.go ]; then echo "Error: cmd/server/main.go not found"; exit 1; fi
+# Verify the main file exists
+RUN if [ ! -f main.go ]; then echo "Error: main.go not found in project root"; exit 1; fi
 
 # Build the binary with verbose output
-RUN CGO_ENABLED=0 GOOS=linux go build -v -a -installsuffix cgo -o server ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -v -a -installsuffix cgo -o server ./main.go
 
 # Stage 2: Create minimal runtime image
 FROM alpine:3.18
