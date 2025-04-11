@@ -1,8 +1,8 @@
 package api
 
 import (
-	"Promotopia/sqlc"
-	"Promotopia/util"
+	"Hanami/sqlc"
+	"Hanami/util"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -78,7 +78,10 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	router.GET("/api/campaignPerformance", server.get_Brand_Campaign_Performance)
 	router.GET("/api/revenue", server.get_Brand_Revenue)
 	router.GET("/api/utm", server.get_Brand_UTM_Performance)
-
+	router.GET("/api/campaignEffectiveness", server.get_CampaignEffectiveness)
+	router.GET("/api/metricsTime", server.get_MetricsOverTime)
+	router.GET("/api/campaignSpecific", server.get_Campaign_Specific)
+	router.GET("/api/revenueDetails", server.get_Revenue_Details)
 
 	server.router = router
 

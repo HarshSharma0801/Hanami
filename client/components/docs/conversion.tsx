@@ -1,15 +1,15 @@
-'use client'
-import React, { useState } from 'react';
-import { FaCopy } from 'react-icons/fa'; 
+"use client";
+import React, { useState } from "react";
+import { FaCopy } from "react-icons/fa";
 
 const ConversionApiDocs: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('typescript'); 
-  const [copied, setCopied] = useState<string>(''); 
+  const [activeTab, setActiveTab] = useState("typescript");
+  const [copied, setCopied] = useState<string>("");
 
   const copyToClipboard = (text: string, snippetId: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(snippetId);
-      setTimeout(() => setCopied(''), 2000); 
+      setTimeout(() => setCopied(""), 2000);
     });
   };
 
@@ -298,28 +298,47 @@ func main() {
   return (
     <div className="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen">
       <h1 className="text-4xl font-bold text-gray-800 mb-6">
-        Promotopia Conversion API Documentation
+        Hanami Conversion API Documentation
       </h1>
 
       <section className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Overview</h2>
         <p className="text-gray-600">
-          The <code>create_conversion</code> endpoint allows brand developers to record a conversion event (e.g., a purchase) by sending a list of trackers (clicks) that contributed to the conversion. The endpoint calculates attribution weights using the U-Shaped (Position-Based) model and stores the conversion data for each tracker, including the session ID, amount, currency, and weight.
+          The <code>create_conversion</code> endpoint allows brand developers to
+          record a conversion event (e.g., a purchase) by sending a list of
+          trackers (clicks) that contributed to the conversion. The endpoint
+          calculates attribution weights using the U-Shaped (Position-Based)
+          model and stores the conversion data for each tracker, including the
+          session ID, amount, currency, and weight.
         </p>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Endpoint Details</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          Endpoint Details
+        </h2>
         <ul className="list-disc pl-5 text-gray-600">
-          <li><strong>Method:</strong> POST</li>
-          <li><strong>URL:</strong> <code>/api/conversions</code></li>
-          <li><strong>Content-Type:</strong> <code>application/json</code></li>
-          <li><strong>Authentication:</strong> Requires an API token in the <code>Authorization</code> header (e.g., <code>Bearer &lt;your-api-token&gt;</code>).</li>
+          <li>
+            <strong>Method:</strong> POST
+          </li>
+          <li>
+            <strong>URL:</strong> <code>/api/conversions</code>
+          </li>
+          <li>
+            <strong>Content-Type:</strong> <code>application/json</code>
+          </li>
+          <li>
+            <strong>Authentication:</strong> Requires an API token in the{" "}
+            <code>Authorization</code> header (e.g.,{" "}
+            <code>Bearer &lt;your-api-token&gt;</code>).
+          </li>
         </ul>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Request Structure</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          Request Structure
+        </h2>
         <pre className="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
           {`{
   "session_id": "string", // UUID of the session
@@ -336,7 +355,9 @@ func main() {
   "currency": "string" // ISO 4217 currency code
 }`}
         </pre>
-        <h3 className="text-xl font-medium text-gray-700 mt-4 mb-2">Required Fields</h3>
+        <h3 className="text-xl font-medium text-gray-700 mt-4 mb-2">
+          Required Fields
+        </h3>
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-gray-200">
@@ -351,75 +372,87 @@ func main() {
             <tr>
               <td className="p-2 border">session_id</td>
               <td className="p-2 border">string</td>
-              <td className="p-2 border">Unique identifier for the user session (UUID format).</td>
+              <td className="p-2 border">
+                Unique identifier for the user session (UUID format).
+              </td>
               <td className="p-2 border">Yes</td>
               <td className="p-2 border">Must be a valid UUID.</td>
             </tr>
             <tr>
               <td className="p-2 border">trackers</td>
               <td className="p-2 border">Tracker[]</td>
-              <td className="p-2 border">Array of trackers (clicks) that contributed to the conversion.</td>
+              <td className="p-2 border">
+                Array of trackers (clicks) that contributed to the conversion.
+              </td>
               <td className="p-2 border">Yes</td>
               <td className="p-2 border">Must contain at least 1 tracker.</td>
             </tr>
             <tr>
               <td className="p-2 border">amount</td>
               <td className="p-2 border">number</td>
-              <td className="p-2 border">The conversion amount (e.g., purchase value).</td>
+              <td className="p-2 border">
+                The conversion amount (e.g., purchase value).
+              </td>
               <td className="p-2 border">Yes</td>
               <td className="p-2 border">Must be greater than 0.</td>
             </tr>
             <tr>
               <td className="p-2 border">currency</td>
               <td className="p-2 border">string</td>
-              <td className="p-2 border">The currency of the conversion amount (ISO 4217 code).</td>
+              <td className="p-2 border">
+                The currency of the conversion amount (ISO 4217 code).
+              </td>
               <td className="p-2 border">Yes</td>
-              <td className="p-2 border">Must be one of: USD, INR, EUR, GBP, JPY, CAD, AUD.</td>
+              <td className="p-2 border">
+                Must be one of: USD, INR, EUR, GBP, JPY, CAD, AUD.
+              </td>
             </tr>
           </tbody>
         </table>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Integration Examples</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          Integration Examples
+        </h2>
         <div className="border-b border-gray-300 mb-4">
           <div className="flex space-x-4">
             <button
-              onClick={() => setActiveTab('typescript')}
+              onClick={() => setActiveTab("typescript")}
               className={`py-2 px-4 font-medium ${
-                activeTab === 'typescript'
-                  ? 'border-b-2 border-blue-500 text-blue-500'
-                  : 'text-gray-500'
+                activeTab === "typescript"
+                  ? "border-b-2 border-blue-500 text-blue-500"
+                  : "text-gray-500"
               }`}
             >
               TypeScript
             </button>
             <button
-              onClick={() => setActiveTab('javascript')}
+              onClick={() => setActiveTab("javascript")}
               className={`py-2 px-4 font-medium ${
-                activeTab === 'javascript'
-                  ? 'border-b-2 border-blue-500 text-blue-500'
-                  : 'text-gray-500'
+                activeTab === "javascript"
+                  ? "border-b-2 border-blue-500 text-blue-500"
+                  : "text-gray-500"
               }`}
             >
               JavaScript
             </button>
             <button
-              onClick={() => setActiveTab('python')}
+              onClick={() => setActiveTab("python")}
               className={`py-2 px-4 font-medium ${
-                activeTab === 'python'
-                  ? 'border-b-2 border-blue-500 text-blue-500'
-                  : 'text-gray-500'
+                activeTab === "python"
+                  ? "border-b-2 border-blue-500 text-blue-500"
+                  : "text-gray-500"
               }`}
             >
               Python
             </button>
             <button
-              onClick={() => setActiveTab('go')}
+              onClick={() => setActiveTab("go")}
               className={`py-2 px-4 font-medium ${
-                activeTab === 'go'
-                  ? 'border-b-2 border-blue-500 text-blue-500'
-                  : 'text-gray-500'
+                activeTab === "go"
+                  ? "border-b-2 border-blue-500 text-blue-500"
+                  : "text-gray-500"
               }`}
             >
               Go
@@ -436,14 +469,20 @@ func main() {
             className="absolute top-2 right-2 text-gray-400 hover:text-gray-200 flex items-center"
           >
             <FaCopy />
-            <span className="ml-1">{copied === activeTab ? 'Copied!' : 'Copy'}</span>
+            <span className="ml-1">
+              {copied === activeTab ? "Copied!" : "Copy"}
+            </span>
           </button>
         </div>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Response Structure</h2>
-        <h3 className="text-xl font-medium text-gray-700 mb-2">Success (200 OK)</h3>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          Response Structure
+        </h2>
+        <h3 className="text-xl font-medium text-gray-700 mb-2">
+          Success (200 OK)
+        </h3>
         <pre className="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
           {`{
   "conversions": [
@@ -459,7 +498,9 @@ func main() {
   ]
 }`}
         </pre>
-        <h3 className="text-xl font-medium text-gray-700 mt-4 mb-2">Error (e.g., 400 Bad Request)</h3>
+        <h3 className="text-xl font-medium text-gray-700 mt-4 mb-2">
+          Error (e.g., 400 Bad Request)
+        </h3>
         <pre className="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
           {`{
   "error": "At least one tracker is required"
@@ -468,23 +509,44 @@ func main() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Attribution Model</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          Attribution Model
+        </h2>
         <p className="text-gray-600">
-          The endpoint uses the <strong>U-Shaped (Position-Based)</strong> model to assign weights:
+          The endpoint uses the <strong>U-Shaped (Position-Based)</strong> model
+          to assign weights:
         </p>
         <ul className="list-disc pl-5 text-gray-600">
-          <li>1 tracker: 100% (<code>1.0</code>).</li>
-          <li>2 trackers: 40% first, 40% last (<code>[0.4, 0.4]</code>).</li>
-          <li>3+ trackers: 40% first, 40% last, 20% distributed equally among middle trackers (e.g., 4 trackers: <code>[0.4, 0.1, 0.1, 0.4]</code>).</li>
+          <li>
+            1 tracker: 100% (<code>1.0</code>).
+          </li>
+          <li>
+            2 trackers: 40% first, 40% last (<code>[0.4, 0.4]</code>).
+          </li>
+          <li>
+            3+ trackers: 40% first, 40% last, 20% distributed equally among
+            middle trackers (e.g., 4 trackers: <code>[0.4, 0.1, 0.1, 0.4]</code>
+            ).
+          </li>
         </ul>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Error Handling</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          Error Handling
+        </h2>
         <ul className="list-disc pl-5 text-gray-600">
-          <li><strong>400 Bad Request:</strong> Invalid request format, missing required fields, or invalid UUIDs.</li>
-          <li><strong>401 Unauthorized:</strong> Missing or invalid API token.</li>
-          <li><strong>500 Internal Server Error:</strong> Database or server issues.</li>
+          <li>
+            <strong>400 Bad Request:</strong> Invalid request format, missing
+            required fields, or invalid UUIDs.
+          </li>
+          <li>
+            <strong>401 Unauthorized:</strong> Missing or invalid API token.
+          </li>
+          <li>
+            <strong>500 Internal Server Error:</strong> Database or server
+            issues.
+          </li>
         </ul>
       </section>
     </div>

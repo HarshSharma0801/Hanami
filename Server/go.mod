@@ -1,4 +1,4 @@
-module Promotopia
+module Hanami
 
 go 1.23.1
 

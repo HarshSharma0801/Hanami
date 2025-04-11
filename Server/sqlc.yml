@@ -8,3 +8,4 @@ sql:
         package: "sqlc"
         out: "sqlc"
         sql_package: "database/sql"
+        

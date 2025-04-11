@@ -19,7 +19,7 @@ export function Landing() {
       <Boxes />
       <div className="flex flex-col items-center justify-center gap-3">
         <h1 className={cn("md:text-4xl text-xl text-white relative z-20")}>
-          Promotopia
+          Hanami
         </h1>
         <p className="text-center mt-2 text-neutral-300 relative z-20">
           Welcome to Hub of Affiliate Marketing

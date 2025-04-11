@@ -54,9 +54,6 @@ export default function AnalyticsPage() {
           <TabsTrigger value="campaigns" className="text-base py-3 px-5">
             Campaign Analysis
           </TabsTrigger>
-          <TabsTrigger value="audience" className="text-base py-3 px-5">
-            Audience Insights
-          </TabsTrigger>
           <TabsTrigger value="revenue" className="text-base py-3 px-5">
             Revenue Stats
           </TabsTrigger>
@@ -69,13 +66,6 @@ export default function AnalyticsPage() {
 
         <TabsContent value="campaigns">
           <CampaignAnalysisTab
-            data={data as AnalyticsData}
-            container={container}
-          />
-        </TabsContent>
-
-        <TabsContent value="audience">
-          <AudienceInsightsTab
             data={data as AnalyticsData}
             container={container}
           />

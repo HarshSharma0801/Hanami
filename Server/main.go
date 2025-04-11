@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Promotopia/api"
-	"Promotopia/sqlc"
-	"Promotopia/util"
+	"Hanami/api"
+	"Hanami/sqlc"
+	"Hanami/util"
 	"database/sql"
 	"log"
 

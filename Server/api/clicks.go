@@ -1,7 +1,7 @@
 package api
 
 import (
-	"Promotopia/sqlc"
+	"Hanami/sqlc"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -115,47 +115,47 @@ func (server *Server) redirect_user(ctx *gin.Context) {
 	}
 
 	var sessionData SessionData
-    existingCookie, _ := ctx.Cookie("promo_tracking_session")
-    if existingCookie != "" {
-        err := json.Unmarshal([]byte(existingCookie), &sessionData)
-        if err != nil {
-            sessionData.SessionID = uuid.New().String()
-        }
-    } else {
-        sessionData.SessionID = uuid.New().String()
-    }
+	existingCookie, _ := ctx.Cookie("promo_tracking_session")
+	if existingCookie != "" {
+		err := json.Unmarshal([]byte(existingCookie), &sessionData)
+		if err != nil {
+			sessionData.SessionID = uuid.New().String()
+		}
+	} else {
+		sessionData.SessionID = uuid.New().String()
+	}
 
-    newTracker := Tracker{
-        TrackingCode: linkCode,
-        ClickID:      clickID.String(),
-        UtmSource:    utmSource,
-        UtmMedium:    utmMedium,
-        Timestamp:    time.Now().UTC(),
-    }
-    sessionData.Trackers = append(sessionData.Trackers, newTracker)
+	newTracker := Tracker{
+		TrackingCode: linkCode,
+		ClickID:      clickID.String(),
+		UtmSource:    utmSource,
+		UtmMedium:    utmMedium,
+		Timestamp:    time.Now().UTC(),
+	}
+	sessionData.Trackers = append(sessionData.Trackers, newTracker)
 
-    sessionDataJSON, err := json.Marshal(sessionData)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to serialize session data"})
-        return
-    }
+	sessionDataJSON, err := json.Marshal(sessionData)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to serialize session data"})
+		return
+	}
 
-    domain := parsedLandingURL.Hostname() 
-    secure := true
-    if server.config.ENVIRONMENT == "DEV" {
+	domain := parsedLandingURL.Hostname()
+	secure := true
+	if server.config.ENVIRONMENT == "DEV" {
 		domain = "localhost"
-        secure = false
-    }
+		secure = false
+	}
 
-    ctx.SetCookie(
-        "promo_tracking_session",
-        string(sessionDataJSON),
-        30*24*60*60,
-        "/",
-        domain,
-        secure,
-        true,
-    )
+	ctx.SetCookie(
+		"promo_tracking_session",
+		string(sessionDataJSON),
+		30*24*60*60,
+		"/",
+		domain,
+		secure,
+		true,
+	)
 	redirectURL := fmt.Sprintf("%s?click_id=%s", landingURL, click.ClickID.String())
 	ctx.Redirect(http.StatusFound, redirectURL)
 
