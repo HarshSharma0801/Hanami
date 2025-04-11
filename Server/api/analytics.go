@@ -150,3 +150,131 @@ func (server *Server) get_Brand_UTM_Performance(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"utmSource": utmSource, "utmMedium": utmMedium})
 }
+
+func (server *Server) get_CampaignEffectiveness(ctx *gin.Context) {
+	id := ctx.Query("brandId")
+
+	brandId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
+	}
+
+	convertedId := sql.NullInt64{
+		Int64: brandId,
+		Valid: true,
+	}
+
+	effectiveness, err := server.store.Get_CampaignEffectiveness(ctx, convertedId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"effectiveness": effectiveness})
+}
+
+func (server *Server) get_MetricsOverTime(ctx *gin.Context) {
+	id := ctx.Query("brandId")
+
+	brandId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
+	}
+
+	convertedId := sql.NullInt64{
+		Int64: brandId,
+		Valid: true,
+	}
+
+	metrics, err := server.store.Get_MetricsOverTime(ctx, convertedId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"metrics": metrics})
+}
+
+func (server *Server) get_Campaign_Specific(ctx *gin.Context) {
+	id := ctx.Query("brandId")
+
+	brandId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
+	}
+
+	convertedId := sql.NullInt64{
+		Int64: brandId,
+		Valid: true,
+	}
+
+	metrics, err := server.store.GetCampaign_Specific_Effectiveness(ctx, convertedId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"metrics": metrics})
+}
+
+
+
+func (server *Server) get_Revenue_Details(ctx *gin.Context) {
+	id := ctx.Query("brandId")
+
+	brandId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
+	}
+
+	rawData, err := server.store.Get_Revenue_Data(ctx, brandId)
+	if err != nil {
+		log.Printf("Failed to fetch raw revenue data: %v", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var revenueData []struct {
+		Month   string  `json:"month"`
+		Revenue float64 `json:"revenue"`
+	}
+
+	for _, row := range rawData {
+		rawRevenue, err := strconv.ParseFloat(row.RawRevenue, 64)
+		if err != nil {
+			log.Printf("Failed to parse raw revenue %s: %v", row.RawRevenue, err)
+			rawRevenue = 0.0 
+		}
+
+		var baseCurrency string
+		if len(row.Currencies) > 0 {
+			currStr := string(row.Currencies)
+			currencies := strings.Split(currStr, ", ")
+			baseCurrency = currencies[0] 
+			if baseCurrency == "" {
+				baseCurrency = "USD" 
+			}
+		} else {
+			baseCurrency = "USD" 
+		}
+
+		usdRevenue := rawRevenue
+		rate, exists := exchangeRates[baseCurrency]
+		if exists {
+			usdRevenue = rawRevenue / rate 
+		} else {
+			log.Printf("Exchange rate not found for currency: %s, using 1.0 as fallback", baseCurrency)
+		}
+
+		revenueData = append(revenueData, struct {
+			Month   string  `json:"month"`
+			Revenue float64 `json:"revenue"`
+		}{Month: row.Month, Revenue: usdRevenue})
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"revenueData": revenueData})
+}

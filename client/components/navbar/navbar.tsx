@@ -35,7 +35,7 @@ export default function Navbar() {
       transition={{ duration: 0.3 }}
       className="fixed px-8 top-0 left-0 right-0 bg-white shadow-md p-4 flex justify-between items-center z-10"
     >
-      <div className="text-2xl font-semibold">Promotopia</div>
+      <div className="text-2xl font-semibold">Hanami</div>
       {session?.user.role === "brand" && (
         <Button
           variant="outline"

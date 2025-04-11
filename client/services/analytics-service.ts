@@ -65,3 +65,54 @@ export const getUTM = async (brandId: string) => {
     console.log(error);
   }
 };
+
+
+
+export const getCampaignEffectiveness = async (brandId: string) => {
+    try {
+      const response = await axios.get(`/api/campaignEffectiveness`, {
+        params: {
+          brandId: brandId,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data.effectiveness;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  export const getCampaignSpecificEffectiveness = async (brandId: string) => {
+    try {
+      const response = await axios.get(`/api/campaignSpecific`, {
+        params: {
+          brandId: brandId,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data.metrics;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  export const getMetricTime = async (brandId: string) => {
+    try {
+      const response = await axios.get(`/api/metricsTime`, {
+        params: {
+          brandId: brandId,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data.metrics;
+    } catch (error) {
+      console.log(error);
+    }
+  };

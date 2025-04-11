@@ -19,6 +19,13 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface RadarChartProps {
   title: string;
@@ -41,6 +48,32 @@ export default function RadarChartComponent({
   dataKeys,
 }: RadarChartProps) {
   const [activeItem, setActiveItem] = useState<number | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<string>("all");
+
+  // Convert string numbers to actual numbers in the data
+  const processedData = data.map(item => {
+    const newItem = {...item};
+    dataKeys.radars.forEach(radar => {
+      if (typeof newItem[radar.key] === 'string') {
+        newItem[radar.key] = parseFloat(newItem[radar.key]);
+      }
+    });
+    return newItem;
+  });
+
+  // Prepare data for the select dropdown
+  const campaignOptions = [
+    { value: "all", label: "All Campaigns" },
+    ...processedData.map((item) => ({
+      value: item[dataKeys.nameKey],
+      label: item[dataKeys.nameKey],
+    })),
+  ];
+
+  // Filter data based on selected campaign
+  const filteredData = selectedCampaign === "all" 
+    ? processedData 
+    : processedData.filter(item => item[dataKeys.nameKey] === selectedCampaign);
 
   return (
     <motion.div
@@ -51,8 +84,27 @@ export default function RadarChartComponent({
     >
       <Card className="border border-gray-200 shadow-sm h-full">
         <CardHeader className="pb-0">
-          <CardTitle>{title}</CardTitle>
-          {subtitle && <CardDescription>{subtitle}</CardDescription>}
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>{title}</CardTitle>
+              {subtitle && <CardDescription>{subtitle}</CardDescription>}
+            </div>
+            <Select
+              value={selectedCampaign}
+              onValueChange={setSelectedCampaign}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select campaign" />
+              </SelectTrigger>
+              <SelectContent>
+                {campaignOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
 
         <CardContent className="p-3 pt-4 h-[calc(100%-5rem)]">
@@ -61,7 +113,7 @@ export default function RadarChartComponent({
               cx="50%"
               cy="50%"
               outerRadius="70%"
-              data={data}
+              data={filteredData}
               onMouseMove={(e) => {
                 if (e.activeTooltipIndex !== undefined) {
                   setActiveItem(e.activeTooltipIndex);

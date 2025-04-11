@@ -1,7 +1,7 @@
 package api
 
 import (
-	"Promotopia/sqlc"
+	"Hanami/sqlc"
 	"database/sql"
 	"net/http"
 	"strconv"

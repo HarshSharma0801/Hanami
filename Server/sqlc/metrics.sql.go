@@ -10,6 +10,116 @@ import (
 	"database/sql"
 )
 
+const getCampaign_Specific_Effectiveness = `-- name: GetCampaign_Specific_Effectiveness :many
+WITH campaign_metrics AS (
+    SELECT 
+        c.id AS campaign_id,
+        c.name AS campaign,
+        COUNT(DISTINCT cl.id) AS total_clicks,
+        COUNT(DISTINCT conv.id) AS total_conversions,
+        COALESCE(SUM(s.amount), 0) AS total_sales,
+        COUNT(DISTINCT tl.id) AS total_tracking_links
+    FROM campaigns c
+    LEFT JOIN tracking_links tl ON c.id = tl.campaign_id
+    LEFT JOIN clicks cl ON tl.id = cl.tracking_link_id
+    LEFT JOIN conversions conv ON cl.click_id = conv.click_id
+    LEFT JOIN sales s ON c.brand_id = s.brand_id
+    WHERE c.brand_id = $1
+    GROUP BY c.id, c.name
+),
+max_metrics AS (
+    SELECT 
+        MAX(ROUND((total_sales / 1000.0)::numeric, 1)) AS max_roi,
+        MAX(ROUND((total_conversions::float / NULLIF(total_clicks, 0) * 100)::numeric, 1)) AS max_conversion_rate,
+        MAX(ROUND((total_clicks::float / NULLIF(total_tracking_links, 0) * 10)::numeric, 1)) AS max_engagement
+    FROM campaign_metrics
+)
+SELECT 
+    cm.campaign,
+    ROUND((cm.total_sales / 1000.0)::numeric / mm.max_roi * 10, 1) AS roi,
+    ROUND((cm.total_conversions::float / NULLIF(cm.total_clicks, 0) * 100)::numeric / mm.max_conversion_rate * 10, 1) AS conversion_rate,
+    ROUND((cm.total_clicks::float / NULLIF(cm.total_tracking_links, 0) * 10)::numeric / mm.max_engagement * 10, 1) AS engagement
+FROM campaign_metrics cm
+CROSS JOIN max_metrics mm
+WHERE (cm.total_clicks > 0 OR cm.total_conversions > 0 OR cm.total_sales > 0)
+ORDER BY cm.campaign
+`
+
+type GetCampaign_Specific_EffectivenessRow struct {
+	Campaign       string
+	Roi            string
+	ConversionRate string
+	Engagement     string
+}
+
+func (q *Queries) GetCampaign_Specific_Effectiveness(ctx context.Context, brandID sql.NullInt64) ([]GetCampaign_Specific_EffectivenessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCampaign_Specific_Effectiveness, brandID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetCampaign_Specific_EffectivenessRow
+	for rows.Next() {
+		var i GetCampaign_Specific_EffectivenessRow
+		if err := rows.Scan(
+			&i.Campaign,
+			&i.Roi,
+			&i.ConversionRate,
+			&i.Engagement,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const get_BrandSalesRaw = `-- name: Get_BrandSalesRaw :many
+SELECT 
+    s.amount,
+    s.currency,
+    (SELECT COUNT(*) FROM campaigns c WHERE c.brand_id = b.id) AS total_campaigns
+FROM brands b
+LEFT JOIN sales s ON b.id = s.brand_id
+WHERE b.id = $1
+AND s.amount IS NOT NULL
+`
+
+type Get_BrandSalesRawRow struct {
+	Amount         sql.NullString
+	Currency       sql.NullString
+	TotalCampaigns int64
+}
+
+func (q *Queries) Get_BrandSalesRaw(ctx context.Context, id int64) ([]Get_BrandSalesRawRow, error) {
+	rows, err := q.db.QueryContext(ctx, get_BrandSalesRaw, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Get_BrandSalesRawRow
+	for rows.Next() {
+		var i Get_BrandSalesRawRow
+		if err := rows.Scan(&i.Amount, &i.Currency, &i.TotalCampaigns); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const get_Brand_Key_Metrics = `-- name: Get_Brand_Key_Metrics :one
 WITH campaign_data AS (
     SELECT 
@@ -79,6 +189,67 @@ func (q *Queries) Get_Brand_Key_Metrics(ctx context.Context, brandID sql.NullInt
 	return i, err
 }
 
+const get_CampaignEffectiveness = `-- name: Get_CampaignEffectiveness :many
+WITH campaign_metrics AS (
+    SELECT 
+        c.name AS campaign,
+        COUNT(DISTINCT cl.id) AS total_clicks,
+        COUNT(DISTINCT conv.id) AS total_conversions,
+        COALESCE(SUM(s.amount), 0) AS total_sales,
+        COUNT(DISTINCT tl.id) AS total_tracking_links
+    FROM campaigns c
+    LEFT JOIN tracking_links tl ON c.id = tl.campaign_id
+    LEFT JOIN clicks cl ON tl.id = cl.tracking_link_id
+    LEFT JOIN conversions conv ON cl.click_id = conv.click_id
+    LEFT JOIN sales s ON c.brand_id = s.brand_id -- Removed date filtering
+    WHERE c.brand_id = $1
+    GROUP BY c.id, c.name
+)
+SELECT 
+    cm.campaign,
+    ROUND((cm.total_sales / 1000.0)::numeric, 1) AS roi, -- Placeholder: $1000 cost per campaign
+    ROUND((cm.total_conversions::float / NULLIF(cm.total_clicks, 0) * 100)::numeric, 1) AS conversion_rate,
+    ROUND((cm.total_clicks::float / NULLIF(cm.total_tracking_links, 0) * 10)::numeric, 1) AS engagement
+FROM campaign_metrics cm
+WHERE cm.total_clicks > 0 OR cm.total_conversions > 0 OR cm.total_sales > 0
+ORDER BY cm.campaign
+`
+
+type Get_CampaignEffectivenessRow struct {
+	Campaign       string
+	Roi            string
+	ConversionRate string
+	Engagement     string
+}
+
+func (q *Queries) Get_CampaignEffectiveness(ctx context.Context, brandID sql.NullInt64) ([]Get_CampaignEffectivenessRow, error) {
+	rows, err := q.db.QueryContext(ctx, get_CampaignEffectiveness, brandID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Get_CampaignEffectivenessRow
+	for rows.Next() {
+		var i Get_CampaignEffectivenessRow
+		if err := rows.Scan(
+			&i.Campaign,
+			&i.Roi,
+			&i.ConversionRate,
+			&i.Engagement,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const get_Campaign_Performance = `-- name: Get_Campaign_Performance :many
 SELECT 
     TO_CHAR(cl.timestamp, 'Mon') AS month,
@@ -115,6 +286,66 @@ func (q *Queries) Get_Campaign_Performance(ctx context.Context, brandID sql.Null
 			&i.Impressions,
 			&i.Clicks,
 			&i.Conversions,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const get_MetricsOverTime = `-- name: Get_MetricsOverTime :many
+WITH monthly_metrics AS (
+    SELECT 
+        TO_CHAR(cl.timestamp, 'YYYY-MM') AS date,
+        COUNT(DISTINCT cl.id) AS total_clicks,
+        COUNT(DISTINCT tl.id) AS total_tracking_links,
+        COUNT(DISTINCT conv.id) AS total_conversions,
+        COALESCE(SUM(conv.amount), 0) AS total_cost 
+    FROM campaigns c
+    JOIN tracking_links tl ON c.id = tl.campaign_id
+    JOIN clicks cl ON tl.id = cl.tracking_link_id
+    LEFT JOIN conversions conv ON cl.click_id = conv.click_id
+    WHERE c.brand_id = $1
+    GROUP BY TO_CHAR(cl.timestamp, 'YYYY-MM')
+)
+SELECT 
+    mm.date,
+    ROUND((mm.total_clicks::float / NULLIF(mm.total_tracking_links, 0) * 100)::numeric, 1) AS ctr,
+    ROUND((mm.total_cost::float / NULLIF(mm.total_clicks, 0))::numeric, 2) AS cpc,
+    ROUND((mm.total_conversions::float / NULLIF(mm.total_clicks, 0) * 100)::numeric, 1) AS conversion_rate
+FROM monthly_metrics mm
+WHERE mm.total_clicks > 0
+ORDER BY mm.date
+`
+
+type Get_MetricsOverTimeRow struct {
+	Date           string
+	Ctr            string
+	Cpc            string
+	ConversionRate string
+}
+
+func (q *Queries) Get_MetricsOverTime(ctx context.Context, brandID sql.NullInt64) ([]Get_MetricsOverTimeRow, error) {
+	rows, err := q.db.QueryContext(ctx, get_MetricsOverTime, brandID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Get_MetricsOverTimeRow
+	for rows.Next() {
+		var i Get_MetricsOverTimeRow
+		if err := rows.Scan(
+			&i.Date,
+			&i.Ctr,
+			&i.Cpc,
+			&i.ConversionRate,
 		); err != nil {
 			return nil, err
 		}

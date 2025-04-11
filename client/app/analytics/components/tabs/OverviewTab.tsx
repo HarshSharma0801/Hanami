@@ -142,42 +142,46 @@ export default function OverviewTab({ container }: any) {
       {utm && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="h-80">
-            <PieChartComponent
-              title="Traffic Source"
-              subtitle="Clicks by Source"
-              data={utm.utmSource.map((item: any) => ({
-                name: item.Name,
-                value: item.Value,
-              }))} 
-              colors={[
-                "#3b82f6",
-                "#10b981",
-                "#f59e0b",
-                "#6366f1",
-                "#ec4899",
-                "#14b8a6",
-                "#f97316",
-              ]}
-            />
+            {utm.utmSource?.length > 0 && (
+              <PieChartComponent
+                title="Traffic Source"
+                subtitle="Clicks by Source"
+                data={utm.utmSource.map((item: any) => ({
+                  name: item.Name,
+                  value: item.Value,
+                }))}
+                colors={[
+                  "#3b82f6",
+                  "#10b981",
+                  "#f59e0b",
+                  "#6366f1",
+                  "#ec4899",
+                  "#14b8a6",
+                  "#f97316",
+                ]}
+              />
+            )}
           </div>
           <div className="h-80">
-            <PieChartComponent
-              title="Traffic Medium"
-              subtitle="Clicks by Medium"
-              data={utm.utmMedium.map((item: any) => ({
-                name: item.Name,
-                value: item.Value,
-              }))} 
-              colors={[
-                "#6366f1",
-                "#ec4899",
-                "#14b8a6",
-                "#f97316",
-                "#8b5cf6",
-                "#3b82f6",
-                "#10b981",
-              ]}
-            />
+            {utm.utmMedium?.length > 0 && (
+              <PieChartComponent
+                title="Traffic Medium"
+                subtitle="Clicks by Medium"
+                data={utm.utmMedium.map((item: any) => ({
+                  name: item.Name,
+                  value: item.Value,
+                }))}
+                colors={[
+                  "#6366f1",
+                  "#ec4899",
+                  "#14b8a6",
+                  "#f97316",
+                  "#8b5cf6",
+                  "#3b82f6",
+                  "#10b981",
+                ]}
+              />
+            )}
           </div>
         </div>
       )}
