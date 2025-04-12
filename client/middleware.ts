@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from './app/api/auth/[...nextauth]/route'; // Import auth from route.ts
 import { apiAuthPrefix, publicRoutes, authRoutes } from './routes';
 
-const defaultRedirect = '/campaign';
+const defaultRedirect = '/campaigns';
 const uploadRoute = '/upload';
 
 export default auth(async (req) => {
