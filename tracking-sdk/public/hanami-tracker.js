@@ -86,8 +86,9 @@
           utils.log('SessionData', sessionData);
 
           if (params.click_id) {
-              utils.log('Detected click_id in URL', sessionData);
-              
+              console.log("session data below")
+              utils.log('bjbjb', sessionData);
+              console.log("session data here" , sessionData)
               // Store click_id for future reference
               this.clickId = params.click_id;
               
