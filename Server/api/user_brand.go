@@ -120,13 +120,13 @@ func (server *Server) login_user_brand(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration, user.Email)
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, time.Minute*15, user.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration, user.Email)
+	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(user.Username, time.Hour*12*60, user.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

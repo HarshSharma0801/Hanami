@@ -3,6 +3,7 @@ package api
 import (
 	"Hanami/sqlc"
 	"Hanami/util"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -17,7 +18,7 @@ type Server struct {
 
 func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 
-	tokenMaker, err := util.NewPasetoMaker(config.TokenSymmetricKey)
+	tokenMaker, err := util.NewPasetoMaker(os.Getenv("TOKEN_SYMMETRIC_KEY"))
 	if err != nil {
 		return nil, err
 	}

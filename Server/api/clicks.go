@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -142,7 +143,7 @@ func (server *Server) redirect_user(ctx *gin.Context) {
 
 	domain := parsedLandingURL.Hostname()
 	secure := true
-	if server.config.ENVIRONMENT == "DEV" {
+	if os.Getenv("ENVIRONMENT") == "DEV" {
 		domain = "localhost"
 		secure = false
 	}
