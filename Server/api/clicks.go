@@ -48,6 +48,7 @@ func (server *Server) redirect_user(ctx *gin.Context) {
 	// Validate tracking_code
 	linkCode := ctx.Query("tracking_code")
 	if linkCode == "" {
+		log.Printf("Missing tracking_code parameter")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "tracking_code query parameter is required"})
 		return
 	}
@@ -131,7 +132,7 @@ func (server *Server) redirect_user(ctx *gin.Context) {
 		return
 	}
 
-	// Basic validation to prevent malicious redirects
+	// Validate hostname
 	if parsedLandingURL.Hostname() == "" || strings.Contains(parsedLandingURL.Hostname(), "..") {
 		log.Printf("Invalid landing URL hostname: %s", parsedLandingURL.Hostname())
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid landing URL hostname"})
@@ -182,32 +183,36 @@ func (server *Server) redirect_user(ctx *gin.Context) {
 		domain = "localhost"
 		secure = false
 	} else {
-		// Allow subdomains (e.g., .example.com)
+		// Allow subdomains (e.g., .reservify.vercel.app)
 		if !strings.HasPrefix(domain, ".") {
 			domain = "." + domain
 		}
 	}
 
 	// Log cookie details for debugging
-	log.Printf("Setting cookie: name=promo_tracking_session, domain=%s, secure=%v, size=%d bytes", domain, secure, len(sessionDataJSON))
+	log.Printf("Setting cookie: name=promo_tracking_session, domain=%s, secure=%v, size=%d bytes, value=%s", domain, secure, len(sessionDataJSON), string(sessionDataJSON))
 
-	// Set cookie
-	ctx.SetCookie(
-		"promo_tracking_session",
-		string(sessionDataJSON),
-		30*24*60*60, // 30 days
-		"/",
+	// Set cookie with all attributes in one header
+	cookieValue := url.QueryEscape(string(sessionDataJSON))
+	cookieHeader := fmt.Sprintf(
+		"promo_tracking_session=%s; Domain=%s; Path=/; Max-Age=%d; HttpOnly; %sSameSite=None",
+		cookieValue,
 		domain,
-		secure,
-		true, // HttpOnly
+		30*24*60*60,
+		func() string {
+			if secure {
+				return "Secure; "
+			}
+			return ""
+		}(),
 	)
+	ctx.Writer.Header().Set("Set-Cookie", cookieHeader)
 
-	// Add SameSite for cross-site compatibility
-	if secure {
-		ctx.Writer.Header().Add("Set-Cookie", fmt.Sprintf("promo_tracking_session=%s; SameSite=None; Secure", url.QueryEscape(string(sessionDataJSON))))
-	}
-
-	// Redirect to landing URL
+	// Prepare redirect
 	redirectURL := fmt.Sprintf("%s?click_id=%s", landingURL, click.ClickID.String())
+	log.Printf("Redirecting to: %s", redirectURL)
+
+	// Perform redirect
 	ctx.Redirect(http.StatusFound, redirectURL)
 }
+
