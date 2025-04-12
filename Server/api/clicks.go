@@ -3,31 +3,15 @@ package api
 import (
 	"Hanami/sqlc"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
-
-type Tracker struct {
-	TrackingCode string    `json:"tracking_code"`
-	ClickID      string    `json:"click_id"`
-	UtmSource    string    `json:"utm_source,omitempty"`
-	UtmMedium    string    `json:"utm_medium,omitempty"`
-	Timestamp    time.Time `json:"timestamp"`
-}
-
-type SessionData struct {
-	SessionID string    `json:"session_id"`
-	Trackers  []Tracker `json:"trackers"`
-}
 
 func (server *Server) redirect_user(ctx *gin.Context) {
 	// Extract referer and parse domain
@@ -108,6 +92,8 @@ func (server *Server) redirect_user(ctx *gin.Context) {
 		return
 	}
 
+	log.Printf("New Click %s", click.ClickID)
+
 	// Fetch campaign
 	campaign, err := server.store.Get_Campaign(ctx, tracking_link.CampaignID.Int64)
 	if err != nil {
@@ -138,76 +124,20 @@ func (server *Server) redirect_user(ctx *gin.Context) {
 		return
 	}
 
-	// Manage session data
-	var sessionData SessionData
-	existingCookie, _ := ctx.Cookie("promo_tracking_session")
-	if existingCookie != "" {
-		err := json.Unmarshal([]byte(existingCookie), &sessionData)
-		if err != nil {
-			log.Printf("Failed to parse existing cookie: %v", err)
-			sessionData.SessionID = uuid.New().String()
-		}
-	} else {
-		sessionData.SessionID = uuid.New().String()
+	// Build redirect URL with all tracking parameters
+	redirectURL := fmt.Sprintf("%s?click_id=%s", landingURL, clickID.String())
+
+	// Add tracking_code to redirect URL
+	redirectURL = fmt.Sprintf("%s&tracking_code=%s", redirectURL, url.QueryEscape(linkCode))
+
+	// Add UTM parameters to the redirect URL if they exist
+	if utmSource != "" {
+		redirectURL = fmt.Sprintf("%s&utm_source=%s", redirectURL, url.QueryEscape(utmSource))
+	}
+	if utmMedium != "" {
+		redirectURL = fmt.Sprintf("%s&utm_medium=%s", redirectURL, url.QueryEscape(utmMedium))
 	}
 
-	// Add new tracker
-	newTracker := Tracker{
-		TrackingCode: linkCode,
-		ClickID:      clickID.String(),
-		UtmSource:    utmSource,
-		UtmMedium:    utmMedium,
-		Timestamp:    time.Now().UTC(),
-	}
-
-	// Limit trackers to prevent cookie size issues
-	const maxTrackers = 10
-	if len(sessionData.Trackers) >= maxTrackers {
-		sessionData.Trackers = sessionData.Trackers[len(sessionData.Trackers)-maxTrackers+1:]
-	}
-	sessionData.Trackers = append(sessionData.Trackers, newTracker)
-
-	// Serialize session data
-	sessionDataJSON, err := json.Marshal(sessionData)
-	if err != nil {
-		log.Printf("Failed to serialize session data: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process session data"})
-		return
-	}
-
-	// Set cookie domain and flags
-	domain := parsedLandingURL.Hostname()
-	secure := true
-	if os.Getenv("ENVIRONMENT") == "DEV" {
-		domain = "localhost"
-		secure = false
-	} else {
-		// Allow subdomains (e.g., .example.com)
-		if !strings.HasPrefix(domain, ".") {
-			domain = "." + domain
-		}
-	}
-
-	// Log cookie details for debugging
-	log.Printf("Setting cookie: name=promo_tracking_session, domain=%s, secure=%v, size=%d bytes", domain, secure, len(sessionDataJSON))
-
-	// Set cookie
-	ctx.SetCookie(
-		"promo_tracking_session",
-		string(sessionDataJSON),
-		30*24*60*60, // 30 days
-		"/",
-		domain,
-		secure,
-		true, // HttpOnly
-	)
-
-	// Add SameSite for cross-site compatibility
-	if secure {
-		ctx.Writer.Header().Add("Set-Cookie", fmt.Sprintf("promo_tracking_session=%s; SameSite=None; Secure", url.QueryEscape(string(sessionDataJSON))))
-	}
-
-	// Redirect to landing URL
-	redirectURL := fmt.Sprintf("%s?click_id=%s", landingURL, click.ClickID.String())
+	// Redirect to landing URL with all tracking parameters
 	ctx.Redirect(http.StatusFound, redirectURL)
 }

@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/hanami-tracker.js",
+      "dest": "/hanami-tracker.js",
+      "headers": {
+        "cache-control": "public, max-age=31536000",
+        "access-control-allow-origin": "*"
+      }
+    }
+  ]
+}

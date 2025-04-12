@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HanamiTracker SDK Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .result {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>HanamiTracker SDK Test Page</h1>
+  
+  <div class="card">
+    <h2>SDK Status</h2>
+    <div id="status">Loading...</div>
+  </div>
+  
+  <div class="card">
+    <h2>Test URL Parameters</h2>
+    <form id="paramForm">
+      <div>
+        <label for="tracking_code">tracking_code:</label>
+        <input type="text" id="tracking_code" value="TEST123">
+      </div>
+      <div>
+        <label for="click_id">click_id:</label>
+        <input type="text" id="click_id" value="abc-123-xyz">
+      </div>
+      <div>
+        <label for="utm_source">utm_source:</label>
+        <input type="text" id="utm_source" value="test_source">
+      </div>
+      <div>
+        <label for="utm_medium">utm_medium:</label>
+        <input type="text" id="utm_medium" value="test_medium">
+      </div>
+      <button type="button" id="simulateBtn">Simulate URL Parameters</button>
+    </form>
+  </div>
+  
+  <div class="card">
+    <h2>SDK Methods</h2>
+    <button id="getSessionBtn">Get Session Data</button>
+    <button id="getClickIdBtn">Get Click ID</button>
+    <button id="getLastTrackerBtn">Get Last Tracker</button>
+    <button id="getAllTrackersBtn">Get All Trackers</button>
+    <div class="result" id="methodResult">Results will appear here</div>
+  </div>
+  
+  <div class="card">
+    <h2>Cookie Information</h2>
+    <button id="showCookieBtn">Show Cookie</button>
+    <div class="result" id="cookieResult">Cookie data will appear here</div>
+  </div>
+
+  <script>
+    // Helper function to display JSON data
+    function displayJSON(data) {
+      return JSON.stringify(data, null, 2);
+    }
+    
+    // Load SDK
+    function loadSDK() {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://tracking-sdk.vercel.app/hanami-tracker.js';
+        script.onload = () => {
+          if (window.HanamiTracker) {
+            window.HanamiTracker.init({ debug: true });
+            document.getElementById('status').textContent = 'SDK loaded successfully!';
+            resolve();
+          } else {
+            document.getElementById('status').textContent = 'SDK loaded but HanamiTracker object not found!';
+            reject('SDK loaded but HanamiTracker object not found');
+          }
+        };
+        script.onerror = () => {
+          document.getElementById('status').textContent = 'Failed to load SDK!';
+          reject('Failed to load SDK');
+        };
+        document.head.appendChild(script);
+      });
+    }
+    
+    // Simulate URL parameters
+    document.getElementById('simulateBtn').addEventListener('click', function() {
+      const tracking_code = document.getElementById('tracking_code').value;
+      const click_id = document.getElementById('click_id').value;
+      const utm_source = document.getElementById('utm_source').value;
+      const utm_medium = document.getElementById('utm_medium').value;
+      
+      // Update URL without refreshing the page
+      const url = new URL(window.location.href);
+      url.searchParams.set('tracking_code', tracking_code);
+      url.searchParams.set('click_id', click_id);
+      url.searchParams.set('utm_source', utm_source);
+      url.searchParams.set('utm_medium', utm_medium);
+      
+      window.history.pushState({}, '', url);
+      
+      // Reload SDK to pick up new parameters
+      window.HanamiTracker.init({ debug: true });
+      
+      document.getElementById('methodResult').textContent = 'URL parameters updated and SDK reinitialized';
+    });
+    
+    // Get session data
+    document.getElementById('getSessionBtn').addEventListener('click', function() {
+      if (window.HanamiTracker) {
+        const data = window.HanamiTracker.getSessionData();
+        document.getElementById('methodResult').textContent = displayJSON(data);
+      }
+    });
+    
+    // Get click ID
+    document.getElementById('getClickIdBtn').addEventListener('click', function() {
+      if (window.HanamiTracker) {
+        const clickId = window.HanamiTracker.getClickId();
+        document.getElementById('methodResult').textContent = clickId || 'No click ID found';
+      }
+    });
+    
+    // Get last tracker
+    document.getElementById('getLastTrackerBtn').addEventListener('click', function() {
+      if (window.HanamiTracker) {
+        const tracker = window.HanamiTracker.getLastTracker();
+        document.getElementById('methodResult').textContent = displayJSON(tracker);
+      }
+    });
+    
+    // Get all trackers
+    document.getElementById('getAllTrackersBtn').addEventListener('click', function() {
+      if (window.HanamiTracker) {
+        const trackers = window.HanamiTracker.getAllTrackers();
+        document.getElementById('methodResult').textContent = displayJSON(trackers);
+      }
+    });
+    
+    // Show cookie
+    document.getElementById('showCookieBtn').addEventListener('click', function() {
+      const cookieData = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('hanami_tracking_session='));
+      
+      if (cookieData) {
+        try {
+          const cookieValue = decodeURIComponent(cookieData.split('=')[1]);
+          const parsedCookie = JSON.parse(cookieValue);
+          document.getElementById('cookieResult').textContent = displayJSON(parsedCookie);
+        } catch (e) {
+          document.getElementById('cookieResult').textContent = 'Error parsing cookie: ' + e.message;
+        }
+      } else {
+        document.getElementById('cookieResult').textContent = 'Cookie not found';
+      }
+    });
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadSDK();
+    });
+  </script>
+</body>
+</html>
