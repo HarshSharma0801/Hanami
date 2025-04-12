@@ -17,7 +17,7 @@ func main() {
 		log.Fatalf("could not able to initialize env : %v", err)
 	}
 
-	conn, err := sql.Open(config.Driver, config.DbUrl)
+	conn, err := sql.Open("postgres", config.DbUrl)
 	if err != nil {
 		log.Fatalf("could not able to connect to database : %v", err)
 	}
