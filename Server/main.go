@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("could not able to initialize server  : %v", err)
 	}
 
-	if err := server.Init(config.Port); err != nil {
+	if err := server.Init("0.0.0.0:2050"); err != nil {
 		log.Fatalf("Could not start server: %v", err)
 	}
 
