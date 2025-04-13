@@ -48,8 +48,8 @@
           let cookieString = `${name}=${encodeURIComponent(JSON.stringify(value))}; expires=${expires}; path=/`;
 
           if (isHttps) {
-            // Add Secure and SameSite for HTTPS
-            cookieString += '; Secure; SameSite=Strict';
+            // Add Secure and SameSite None for HTTPS
+            cookieString += '; Secure; SameSite=None';
           }
 
           document.cookie = cookieString;
