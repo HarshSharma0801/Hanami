@@ -109,14 +109,14 @@ export default function RevenueStatsTab({
           <CardContent>
             <p className="text-gray-600 mb-4">
               Your revenue has shown a steady increase over the last 7 months,
-              with the highest growth seen in June-July. The "Summer Sale" and
-              "Holiday Special" campaigns have been the top revenue generators.
+              with the highest growth seen in June-July. The Summer Sale and
+              Holiday Special campaigns have been the top revenue generators.
             </p>
             <h3 className="text-md font-semibold mt-4 mb-2">Opportunities</h3>
             <ul className="list-disc list-inside text-gray-600 space-y-1">
               <li>Increase investment in successful campaign formats</li>
               <li>
-                Optimize lower-performing campaigns like "Brand Awareness"
+                Optimize lower-performing campaigns like Brand Awareness
               </li>
               <li>Leverage seasonal trends for better revenue performance</li>
               <li>Focus on reducing customer acquisition costs</li>

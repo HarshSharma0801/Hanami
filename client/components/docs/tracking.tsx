@@ -271,7 +271,7 @@ export default ProductPage;
             <tr>
               <td className="p-2 border"><code>HanamiTracker.init(options)</code></td>
               <td className="p-2 border">
-                Initializes the tracking SDK with optional configuration. Called automatically if <code>data-auto-init="true"</code> is set.
+                Initializes the tracking SDK with optional configuration. Called automatically if <code>data-auto-init=&rdquotrue&rdquo</code> is set.
               </td>
               <td className="p-2 border">SDK instance</td>
             </tr>

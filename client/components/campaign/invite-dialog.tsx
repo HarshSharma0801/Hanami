@@ -69,7 +69,7 @@ export default function InviteDialog({ campaignId }: { campaignId: string }) {
         <DialogHeader>
           <DialogTitle>Check Email Availability</DialogTitle>
           <DialogDescription>
-            Enter an email to check if it's available.
+            Enter an email to check if its available.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
