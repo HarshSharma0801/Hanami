@@ -12,9 +12,7 @@ import { useSession } from "next-auth/react";
 const sidebarItems = [
   { name: "Campaigns", href: "/campaigns" },
   { name: "Analytics", href: "/analytics" },
-  { name: "Profile", href: "/campaigns/profile" },
-  { name: "Settings", href: "/campaigns/settings" },
-  { name: "Developer Doc", href: "/brand/docs" },
+  { name: "Developer Docs", href: "/brand/docs" },
 ];
 
 export default function Sidebar({

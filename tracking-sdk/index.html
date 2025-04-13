@@ -90,7 +90,7 @@
     function loadSDK() {
       return new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = 'https://tracking-sdk.vercel.app/hanami-tracker.js';
+        script.src = 'https://hanami-six.vercel.app/hanami-tracker.js';
         script.onload = () => {
           if (window.HanamiTracker) {
             window.HanamiTracker.init({ debug: true });
