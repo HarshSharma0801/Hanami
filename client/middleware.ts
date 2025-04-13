@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from './app/api/auth/[...nextauth]/route'; // Import auth from route.ts
+import { auth } from './app/api/auth/[...nextauth]/auth'; // Import auth from auth.ts
 import { apiAuthPrefix, publicRoutes, authRoutes } from './routes';
 
 const defaultRedirect = '/campaigns';

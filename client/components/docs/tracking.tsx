@@ -29,7 +29,7 @@ export default function Document() {
               // Create script element
               const script = document.createElement('script');
               script.async = true;
-              script.src = 'https://hanami-six.vercel/hanami-tracker.js';
+              script.src = 'https://hanami-six.vercel.app/hanami-tracker.js';
               script.setAttribute('data-auto-init', 'true');
               
               // Insert script into document
@@ -72,7 +72,7 @@ export default function Document() {
         // Create script element
         const script = document.createElement('script');
         script.async = true;
-        script.src = 'https://hanami-six.vercel/hanami-tracker.js';
+        script.src = 'https://hanami-six.vercel.app/hanami-tracker.js';
         script.setAttribute('data-auto-init', 'true');
         
         // Insert script into document
@@ -98,7 +98,7 @@ function App() {
   useEffect(() => {
     // Load Hanami Tracking SDK
     const script = document.createElement('script');
-    script.src = 'https://hanami-six.vercel/hanami-tracker.js';
+    script.src = 'https://hanami-six.vercel.app/hanami-tracker.js';
     script.setAttribute('data-auto-init', 'true');
     script.async = true;
     document.head.appendChild(script);
@@ -271,7 +271,7 @@ export default ProductPage;
             <tr>
               <td className="p-2 border"><code>HanamiTracker.init(options)</code></td>
               <td className="p-2 border">
-                Initializes the tracking SDK with optional configuration. Called automatically if <code>data-auto-init=&rdquotrue&rdquo</code> is set.
+                Initializes the tracking SDK with optional configuration. Called automatically if <code>data-auto-init=&quot;true&quot;</code> is set.
               </td>
               <td className="p-2 border">SDK instance</td>
             </tr>
