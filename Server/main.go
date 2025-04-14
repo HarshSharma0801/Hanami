@@ -18,7 +18,7 @@ func main() {
 		log.Fatalf("could not able to initialize env : %v", err)
 	}
 
-	conn, err := sql.Open("postgres", "postgresql://hanami_owner:npg_7iOmAR3wJSWb@ep-curly-lab-a5jmpje2-pooler.us-east-2.aws.neon.tech/hanami?sslmode=require")
+	conn, err := sql.Open(os.Getenv("DRIVER"), os.Getenv("DB_URL"))
 	if err != nil {
 		log.Fatalf("could not able to connect to database : %v", err)
 	}
