@@ -77,6 +77,9 @@ export default function Affiliates({ campaignId }: { campaignId: string }) {
                   <TableHead className="font-semibold text-gray-700 py-4">
                     Conversions
                   </TableHead>
+                  <TableHead className="font-semibold text-gray-700 py-4">
+                    Conversion Amount
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -102,10 +105,13 @@ export default function Affiliates({ campaignId }: { campaignId: string }) {
                       ).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="py-4 text-left text-gray-800">
-                      TBD Later
+                      {affiliate.ClickCount}
                     </TableCell>
                     <TableCell className="py-4 text-left text-gray-800">
-                      TBD Later
+                      {affiliate.ConversionCount}
+                    </TableCell>
+                    <TableCell className="py-4 text-left text-gray-800">
+                      {affiliate.TotalConversionAmount}
                     </TableCell>
                   </motion.tr>
                 ))}

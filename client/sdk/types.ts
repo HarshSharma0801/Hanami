@@ -102,6 +102,9 @@ export interface Affiliate {
     Time: string;
     Valid: boolean;
   };
+  ClickCount: number;
+  ConversionCount: number;
+  TotalConversionAmount: number;
 }
 
 export interface AffiliateResponse {
@@ -165,4 +168,3 @@ export interface Invite {
     Valid: boolean;
   };
 }
-

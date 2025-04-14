@@ -69,11 +69,28 @@ SELECT
     u.email,
     u.role,
     u.created_at AS user_created_at,
-    ac.created_at AS affiliate_campaign_created_at
+    ac.created_at AS affiliate_campaign_created_at,
+    COUNT(DISTINCT c.id) AS click_count,
+    COUNT(DISTINCT conv.id) AS conversion_count,
+    COALESCE(SUM(conv.amount), 0) AS total_conversion_amount,
+    ARRAY_AGG(DISTINCT c.click_id) FILTER (WHERE c.click_id IS NOT NULL) AS click_ids,
+    ARRAY_AGG(DISTINCT conv.id) FILTER (WHERE conv.id IS NOT NULL) AS conversion_ids
 FROM affiliate_campaigns ac
 JOIN affiliates a ON ac.affiliate_id = a.id
 JOIN users u ON a.user_id = u.id
+LEFT JOIN tracking_links tl ON tl.affiliate_id = a.id AND tl.campaign_id = ac.campaign_id
+LEFT JOIN clicks c ON c.tracking_link_id = tl.id
+LEFT JOIN conversions conv ON conv.click_id = c.click_id
 WHERE ac.campaign_id = $1
+GROUP BY 
+    a.id,
+    a.user_id,
+    a.created_at,
+    u.username,
+    u.email,
+    u.role,
+    u.created_at,
+    ac.created_at
 ORDER BY ac.created_at DESC
 `
 
@@ -86,6 +103,11 @@ type Get_Affiliates_By_CampaignIDRow struct {
 	Role                       string
 	UserCreatedAt              sql.NullTime
 	AffiliateCampaignCreatedAt sql.NullTime
+	ClickCount                 int64
+	ConversionCount            int64
+	TotalConversionAmount      interface{}
+	ClickIds                   interface{}
+	ConversionIds              interface{}
 }
 
 func (q *Queries) Get_Affiliates_By_CampaignID(ctx context.Context, campaignID int64) ([]Get_Affiliates_By_CampaignIDRow, error) {
@@ -106,6 +128,11 @@ func (q *Queries) Get_Affiliates_By_CampaignID(ctx context.Context, campaignID i
 			&i.Role,
 			&i.UserCreatedAt,
 			&i.AffiliateCampaignCreatedAt,
+			&i.ClickCount,
+			&i.ConversionCount,
+			&i.TotalConversionAmount,
+			&i.ClickIds,
+			&i.ConversionIds,
 		); err != nil {
 			return nil, err
 		}
