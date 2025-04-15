@@ -13,14 +13,9 @@ import AnimatedAreaChart from "../AreaChart";
 import PieChartComponent from "../PieChart";
 import BarChartComponent from "../BarChart";
 import MetricCard from "../MetricCard";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useBrand } from "@/providers/BrandProvider";
-import {
-  getCampaignPerformance,
-  getKeyMetrics,
-  getRevenue,
-  getUTM,
-} from "@/services/analytics-service";
+import { getOverviewTabData } from "@/services/tab-analytics-service";
 import { useState, useEffect } from "react";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -45,51 +40,27 @@ export default function OverviewTab({ container }: any) {
   // State for error handling
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Use useQueries to manage multiple queries with controlled execution
-  const queries = useQueries({
-    queries: [
-      {
-        queryKey: ["keymetrics", brandId],
-        queryFn: () => retryApi(() => getKeyMetrics(brandId)),
-        enabled: !!brandId,
-        retry: false, // Handled by retryApi
-      },
-      {
-        queryKey: ["campaign-performance", brandId],
-        queryFn: () => retryApi(() => getCampaignPerformance(brandId)),
-        enabled: !!brandId,
-        retry: false,
-      },
-      {
-        queryKey: ["revenue", brandId],
-        queryFn: () => retryApi(() => getRevenue(brandId)),
-        enabled: !!brandId,
-        retry: false,
-      },
-      {
-        queryKey: ["utm", brandId],
-        queryFn: () => retryApi(() => getUTM(brandId)),
-        enabled: !!brandId,
-        retry: false,
-      },
-    ],
+  // Use a single query to fetch all data for this tab
+  const { data: tabData, isLoading, error } = useQuery({
+    queryKey: ["overviewTab", brandId],
+    queryFn: () => retryApi(() => getOverviewTabData(brandId)),
+    enabled: !!brandId,
   });
 
-  const [keyMetricsQuery, campaignPerformanceQuery, revenueQuery, utmQuery] =
-    queries;
-  const keyMetrics = keyMetricsQuery.data;
-  const campaignPerformance = campaignPerformanceQuery.data;
-  const revenueData = revenueQuery.data;
-  const utm = utmQuery.data;
-  const isLoading = queries.some((query) => query.isLoading);
+  // Extract data from the consolidated response
+  const keyMetrics = tabData?.keyMetrics;
+  const campaignPerformance = tabData?.campaignPerformance;
+  const revenueData = tabData?.revenueData;
+  const utm = tabData?.utm;
 
   // Clear error message after 5 seconds
   useEffect(() => {
-    if (errorMessage) {
+    if (error) {
+      setErrorMessage("Failed to load overview data. Please try again.");
       const timer = setTimeout(() => setErrorMessage(null), 5000);
       return () => clearTimeout(timer);
     }
-  }, [errorMessage]);
+  }, [error]);
 
   // Show loading state
   if (isLoading) {
@@ -203,11 +174,11 @@ export default function OverviewTab({ container }: any) {
       {utm && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="h-80">
-            {utm.utmSource?.length > 0 && (
+            {utm.source?.length > 0 && (
               <PieChartComponent
                 title="Traffic Source"
                 subtitle="Clicks by Source"
-                data={utm.utmSource.map((item: any) => ({
+                data={utm.source.map((item: any) => ({
                   name: item.Name,
                   value: item.Value,
                 }))}
@@ -224,11 +195,11 @@ export default function OverviewTab({ container }: any) {
             )}
           </div>
           <div className="h-80">
-            {utm.utmMedium?.length > 0 && (
+            {utm.medium?.length > 0 && (
               <PieChartComponent
                 title="Traffic Medium"
                 subtitle="Clicks by Medium"
-                data={utm.utmMedium.map((item: any) => ({
+                data={utm.medium.map((item: any) => ({
                   name: item.Name,
                   value: item.Value,
                 }))}
