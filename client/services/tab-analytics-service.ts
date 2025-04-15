@@ -67,3 +67,25 @@ export const getRevenueStatsTabData = async (brandId: string) => {
     throw error;
   }
 };
+
+/**
+ * Fetches all data needed for the Overview tab in a single API call
+ * @param brandId The brand ID to fetch data for
+ * @returns Object containing keyMetrics, campaignPerformance, revenueData, and utm data
+ */
+export const getOverviewTabData = async (brandId: string) => {
+  try {
+    const response = await axios.get(`/api/analytics/overview`, {
+      params: {
+        brandId: brandId,
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching overview data:", error);
+    throw error;
+  }
+};

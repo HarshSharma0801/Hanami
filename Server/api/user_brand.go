@@ -120,17 +120,24 @@ func (server *Server) login_user_brand(ctx *gin.Context) {
 		return
 	}
 
+	log.Print("getting looged ")
+
 	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, time.Minute*15, user.Email)
 	if err != nil {
+		log.Print(err)
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	log.Print("getting looged acess")
 
 	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(user.Username, time.Hour*12*60, user.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	log.Print("getting looged refresh ")
 
 	session, err := server.store.CreateSession(ctx, sqlc.CreateSessionParams{
 		ID:           refreshPayload.ID,
@@ -145,6 +152,8 @@ func (server *Server) login_user_brand(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	log.Print("getting looged session")
+
 
 	response := &login_user_brand_res{
 		SessionID:             session.ID,
