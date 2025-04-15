@@ -13,8 +13,7 @@ import AnimatedAreaChart from "../AreaChart";
 import PieChartComponent from "../PieChart";
 import BarChartComponent from "../BarChart";
 import MetricCard from "../MetricCard";
-import { TabProps } from "../../types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { useBrand } from "@/providers/BrandProvider";
 import {
   getCampaignPerformance,
@@ -22,37 +21,84 @@ import {
   getRevenue,
   getUTM,
 } from "@/services/analytics-service";
+import { useState, useEffect } from "react";
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function retryApi<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      console.warn(`Retry ${i + 1}/${maxRetries} for API call`);
+      await delay(1000 * (i + 1)); // Exponential backoff
+    }
+  }
+  throw new Error("Max retries reached");
+}
 
 export default function OverviewTab({ container }: any) {
   const { brand } = useBrand();
+  const brandId = String(brand?.brand.ID) || "";
 
-  const {
-    data: keyMetrics,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["keymetrics"],
-    queryFn: () => getKeyMetrics(String(brand?.brand.ID) || ""),
-    enabled: !!brand?.brand.ID,
+  // State for error handling
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Use useQueries to manage multiple queries with controlled execution
+  const queries = useQueries({
+    queries: [
+      {
+        queryKey: ["keymetrics", brandId],
+        queryFn: () => retryApi(() => getKeyMetrics(brandId)),
+        enabled: !!brandId,
+        retry: false, // Handled by retryApi
+      },
+      {
+        queryKey: ["campaign-performance", brandId],
+        queryFn: () => retryApi(() => getCampaignPerformance(brandId)),
+        enabled: !!brandId,
+        retry: false,
+      },
+      {
+        queryKey: ["revenue", brandId],
+        queryFn: () => retryApi(() => getRevenue(brandId)),
+        enabled: !!brandId,
+        retry: false,
+      },
+      {
+        queryKey: ["utm", brandId],
+        queryFn: () => retryApi(() => getUTM(brandId)),
+        enabled: !!brandId,
+        retry: false,
+      },
+    ],
   });
 
-  const { data: campaignPerformance } = useQuery({
-    queryKey: ["campaign-performance"],
-    queryFn: () => getCampaignPerformance(String(brand?.brand.ID) || ""),
-    enabled: !!brand?.brand.ID,
-  });
+  const [keyMetricsQuery, campaignPerformanceQuery, revenueQuery, utmQuery] =
+    queries;
+  const keyMetrics = keyMetricsQuery.data;
+  const campaignPerformance = campaignPerformanceQuery.data;
+  const revenueData = revenueQuery.data;
+  const utm = utmQuery.data;
+  const isLoading = queries.some((query) => query.isLoading);
 
-  const { data: revenueData } = useQuery({
-    queryKey: ["revenue"],
-    queryFn: () => getRevenue(String(brand?.brand.ID) || ""),
-    enabled: !!brand?.brand.ID,
-  });
+  // Clear error message after 5 seconds
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => setErrorMessage(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
 
-  const { data: utm } = useQuery({
-    queryKey: ["utm"],
-    queryFn: () => getUTM(String(brand?.brand.ID) || ""),
-    enabled: !!brand?.brand.ID,
-  });
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -61,9 +107,19 @@ export default function OverviewTab({ container }: any) {
       animate="show"
       className="space-y-6"
     >
+      {/* Error Message */}
+      {errorMessage && (
+        <div
+          className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4"
+          role="alert"
+        >
+          <p>{errorMessage}</p>
+        </div>
+      )}
+
       {/* Key Metrics */}
       {keyMetrics && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           <MetricCard
             title="Total Campaigns"
             value={keyMetrics.TotalCampaigns}
@@ -108,33 +164,38 @@ export default function OverviewTab({ container }: any) {
           />
         </div>
       )}
+
       {/* Main Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="h-96">
-          <AnimatedAreaChart
-            title="Campaign Performance"
-            subtitle="Impressions, clicks and conversions over time"
-            data={campaignPerformance}
-            dataKeys={{
-              xAxis: "month",
-              areas: [
-                { key: "Impressions", color: "#8884d8", name: "Impressions" },
-                { key: "Clicks", color: "#82ca9d", name: "Clicks" },
-                { key: "Conversions", color: "#ffc658", name: "Conversions" },
-              ],
-            }}
-          />
+          {campaignPerformance && (
+            <AnimatedAreaChart
+              title="Campaign Performance"
+              subtitle="Impressions, clicks and conversions over time"
+              data={campaignPerformance}
+              dataKeys={{
+                xAxis: "month",
+                areas: [
+                  { key: "Impressions", color: "#8884d8", name: "Impressions" },
+                  { key: "Clicks", color: "#82ca9d", name: "Clicks" },
+                  { key: "Conversions", color: "#ffc658", name: "Conversions" },
+                ],
+              }}
+            />
+          )}
         </div>
         <div className="h-96">
-          <BarChartComponent
-            title="Revenue By Month"
-            subtitle="Monthly revenue in USD"
-            data={revenueData}
-            dataKeys={{
-              xAxis: "month",
-              bars: [{ key: "revenue", color: "#6366f1", name: "Revenue" }],
-            }}
-          />
+          {revenueData && (
+            <BarChartComponent
+              title="Revenue By Month"
+              subtitle="Monthly revenue in USD"
+              data={revenueData}
+              dataKeys={{
+                xAxis: "month",
+                bars: [{ key: "revenue", color: "#6366f1", name: "Revenue" }],
+              }}
+            />
+          )}
         </div>
       </div>
 
