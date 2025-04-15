@@ -72,7 +72,6 @@ SELECT
     ac.created_at AS affiliate_campaign_created_at,
     COUNT(DISTINCT c.id) AS click_count,
     COUNT(DISTINCT conv.id) AS conversion_count,
-    COALESCE(SUM(conv.amount), 0) AS total_conversion_amount,
     ARRAY_AGG(DISTINCT c.click_id) FILTER (WHERE c.click_id IS NOT NULL) AS click_ids,
     ARRAY_AGG(DISTINCT conv.id) FILTER (WHERE conv.id IS NOT NULL) AS conversion_ids
 FROM affiliate_campaigns ac
@@ -105,7 +104,6 @@ type Get_Affiliates_By_CampaignIDRow struct {
 	AffiliateCampaignCreatedAt sql.NullTime
 	ClickCount                 int64
 	ConversionCount            int64
-	TotalConversionAmount      interface{}
 	ClickIds                   interface{}
 	ConversionIds              interface{}
 }
@@ -130,7 +128,6 @@ func (q *Queries) Get_Affiliates_By_CampaignID(ctx context.Context, campaignID i
 			&i.AffiliateCampaignCreatedAt,
 			&i.ClickCount,
 			&i.ConversionCount,
-			&i.TotalConversionAmount,
 			&i.ClickIds,
 			&i.ConversionIds,
 		); err != nil {

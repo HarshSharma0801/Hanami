@@ -104,7 +104,6 @@ export interface Affiliate {
   };
   ClickCount: number;
   ConversionCount: number;
-  TotalConversionAmount: number;
 }
 
 export interface AffiliateResponse {
