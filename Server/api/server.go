@@ -83,6 +83,11 @@ func NewServer(store *sqlc.Store, config util.Config) (*Server, error) {
 	router.GET("/api/metricsTime", server.get_MetricsOverTime)
 	router.GET("/api/campaignSpecific", server.get_Campaign_Specific)
 	router.GET("/api/revenueDetails", server.get_Revenue_Details)
+	
+	// New consolidated tab-based analytics endpoints
+	router.GET("/api/analytics/campaign-analysis", server.getCampaignAnalysisTabData)
+	router.GET("/api/analytics/audience-insights", server.getAudienceInsightsTabData)
+	router.GET("/api/analytics/revenue-stats", server.getRevenueStatsTabData)
 
 	server.router = router
 

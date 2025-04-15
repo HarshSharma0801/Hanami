@@ -3,14 +3,9 @@
 import { motion } from "framer-motion";
 import AnimatedAreaChart from "../AreaChart";
 import BarChartComponent from "../BarChart";
-import RadarChartComponent from "../RadarChart";
 import { useBrand } from "@/providers/BrandProvider";
-import { useQueries } from "@tanstack/react-query";
-import {
-  getCampaignEffectiveness,
-  getCampaignSpecificEffectiveness,
-  getMetricTime,
-} from "@/services/analytics-service";
+import { useQuery } from "@tanstack/react-query";
+import { getCampaignAnalysisTabData } from "@/services/tab-analytics-service";
 import { useState, useEffect } from "react";
 
 interface CampaignAnalysisTabProps {
@@ -45,47 +40,20 @@ export default function CampaignAnalysisTab({
   // State for error handling
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Use useQueries to manage all API calls
-  const queries = useQueries({
-    queries: [
-      {
-        queryKey: ["campaignEffectiveness", brandId],
-        queryFn: () => retryApi(() => getCampaignEffectiveness(brandId)),
-        enabled: !!brandId,
-        retry: false, // Handled by retryApi
-      },
-      {
-        queryKey: ["campaign-specific-performance", brandId],
-        queryFn: () =>
-          retryApi(() => getCampaignSpecificEffectiveness(brandId)),
-        enabled: !!brandId,
-        retry: false,
-      },
-      {
-        queryKey: ["metricsTime", brandId],
-        queryFn: () => retryApi(() => getMetricTime(brandId)),
-        enabled: !!brandId,
-        retry: false,
-      },
-    ],
+  // Use a single query to fetch all data for this tab
+  const { data: tabData, isLoading, error } = useQuery({
+    queryKey: ["campaignAnalysisTab", brandId],
+    queryFn: () => retryApi(() => getCampaignAnalysisTabData(brandId)),
+    enabled: !!brandId,
   });
 
-  const [
-    campaignEffectivenessQuery,
-    campaignSpecificEffectivenessQuery,
-    metricsTimeQuery,
-  ] = queries;
-  const campaignEffectiveness = campaignEffectivenessQuery.data;
-  const campaignSpecificEffectiveness = campaignSpecificEffectivenessQuery.data;
-  const metricsTime = metricsTimeQuery.data;
-  const isLoading = queries.some((query) => query.isLoading);
-
   useEffect(() => {
-    if (errorMessage) {
+    if (error) {
+      setErrorMessage("Failed to load campaign analysis data. Please try again.");
       const timer = setTimeout(() => setErrorMessage(null), 5000);
       return () => clearTimeout(timer);
     }
-  }, [errorMessage]);
+  }, [error]);
 
   if (isLoading) {
     return (
@@ -115,11 +83,11 @@ export default function CampaignAnalysisTab({
       {/* Campaign Performance Metrics */}
       <div className="grid grid-cols-1 gap-6">
         <div className="h-96">
-          {campaignEffectiveness && (
+          {tabData?.effectiveness && (
             <BarChartComponent
               title="Campaign Performance Metrics"
               subtitle="ROI, Conversion Rate and Engagement by campaign"
-              data={campaignEffectiveness}
+              data={tabData.effectiveness}
               dataKeys={{
                 xAxis: "Campaign",
                 bars: [
@@ -143,11 +111,11 @@ export default function CampaignAnalysisTab({
 
       {/* Metrics Over Time */}
       <div className="h-96">
-        {metricsTime && (
+        {tabData?.metricsTime && (
           <AnimatedAreaChart
             title="Metrics Over Time"
             subtitle="CTR, CPC, and Conversion Rate trends"
-            data={metricsTime}
+            data={tabData.metricsTime}
             dataKeys={{
               xAxis: "Date",
               areas: [
