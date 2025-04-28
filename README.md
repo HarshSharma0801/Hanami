@@ -1,4 +1,4 @@
-# Hanami Affiliate Marketing Platform
+# Hanami 
 
 Hanami is a comprehensive affiliate marketing platform that empowers both brands and affiliates to track, manage, and optimize their campaigns and traffic. The platform provides robust analytics, campaign management, affiliate onboarding, and transparent conversion tracking, all in a modern, scalable architecture.
 
