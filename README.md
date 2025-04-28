@@ -17,6 +17,29 @@ Hanami is a comprehensive affiliate marketing platform that empowers both brands
 
 ---
 
+## Video
+
+https://github.com/user-attachments/assets/da90758c-434e-460a-925d-eaaaf154d0c5
+
+---
+
+## Screenshots
+
+<img width="1412" alt="Screenshot 2025-04-28 at 7 19 39 PM" src="https://github.com/user-attachments/assets/fe87ff38-334e-428a-81f6-f01169dda68d" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 19 13 PM" src="https://github.com/user-attachments/assets/51b3331f-709d-4056-adff-8c3f5b0fd735" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 18 08 PM" src="https://github.com/user-attachments/assets/71174ea7-a438-4de1-8395-960ec2492faf" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 18 02 PM" src="https://github.com/user-attachments/assets/a7e0512a-9bd8-49c4-8cb5-2e18ac906209" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 17 53 PM" src="https://github.com/user-attachments/assets/67e9fd79-590f-4337-9730-b955682dcb4d" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 17 45 PM" src="https://github.com/user-attachments/assets/f494c378-5295-4ffb-900e-8587794a3205" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 17 41 PM" src="https://github.com/user-attachments/assets/6cd59ee3-c443-4378-a2b0-25a320387557" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 17 35 PM" src="https://github.com/user-attachments/assets/cf250b06-919a-4f86-b4ad-2a17242eeaae" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 17 32 PM" src="https://github.com/user-attachments/assets/89eabf80-b2b7-411e-bd54-feaa7c022f40" />
+<img width="1465" alt="Screenshot 2025-04-28 at 7 17 26 PM" src="https://github.com/user-attachments/assets/84746391-f691-4bcb-9ebb-9e7736a270f6" />
+
+
+---
+
+
 ## Features
 - **Campaign Management:** Brands can create, manage, and analyze affiliate campaigns.
 - **Affiliate Onboarding:** Affiliates can register, receive invites, and join campaigns.
