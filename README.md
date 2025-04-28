@@ -29,7 +29,8 @@ Hanami is a comprehensive affiliate marketing platform that empowers both brands
 
 ## Architecture Overview
 
-![Hanami Architecture](architecture.png)
+![Hanami](https://github.com/user-attachments/assets/772d93b6-2dd8-4d39-8a43-5b5c05ff1fdd)
+
 
 **Key Components:**
 - **Hanami Frontend:** Next.js-based dashboard for brands and affiliates to view analytics, manage campaigns, and access documentation.
